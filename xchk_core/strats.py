@@ -79,7 +79,7 @@ class Negation(CheckingPredicate):
         # invert the desired outcome, but also invert the explanation in case of mismatch
         # for loose coupling, just tell child that parent is a negation
         child_analysis = self.negated_predicate.check_submission(submission,student_path,model_path,not desired_outcome,init_check_number,parent_is_negation=True)
-        return OutcomeAnalysis(outcome=not child_analysis.outcome,outcomes_components=child_analysis.outcomes_components,child_analysis.successor_component_number)
+        return OutcomeAnalysis(outcome=not child_analysis.outcome,outcomes_components=child_analysis.outcomes_components,successor_component_number=child_analysis.successor_component_number)
 
 class ConjunctiveCheck(CheckingPredicate):
 
