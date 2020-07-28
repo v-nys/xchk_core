@@ -1,8 +1,24 @@
-from .models import SubmissionState
 import logging
 import os
+from dataclasses import dataclass
+from typing import Any
+from .models import SubmissionState
 
 logger = logging.getLogger(__name__)
+
+@dataclass
+class OutcomeComponent:
+    component_number: int
+    outcome: bool
+    desired_outcome: bool
+    renderer: str
+    renderer_data: Any
+
+@dataclass
+class OutcomeAnalysis:
+    outcome: bool
+    outcomes_components: List[OutcomeComponent]
+    successor_component_number: int
 
 class CheckingPredicate:
 
@@ -28,20 +44,14 @@ class CheckingPredicate:
         return same_types and same_vars
 
     def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
-        # TODO: aanpassen
-        # overall outcome zal altijd True zijn voor nulvoorwaarde
-        return ((True,\
-                # houden tel bij van welke voorwaarde faalt om zo feedback op juiste vwd. te geven
-                 [(init_check_number,\
-                # verkregen uitkomst, makkelijk deze te hebben om info te filteren
-                   True,\
-                # moeten weten of deze juist wel of niet moest slagen
-                   desired_outcome,\
-                # renderer voor extra info
-                   "text" if not desired_outcome else None,\
-                # extra info in rendererformaat
-                   "aan false kan nooit voldaan zijn" if not desired_outcome else None)]),\
-                init_check_number + 1)
+        components = [OutcomeComponent(component_number=init_check_number,
+                                       outcome=True,
+                                       desired_outcome=desired_outcome,
+                                       renderer="text" if not desired_outcome else None,
+                                       renderer_data="aan false kan nooit voldaan zijn" if not desired_outcome else None)]
+        return OutcomeAnalysis(outcome=True,
+                               outcomes_components=components,
+                               successor_component_number=init_check_number+1)
 
 class TrueCheck(CheckingPredicate):
     pass
@@ -68,8 +78,8 @@ class Negation(CheckingPredicate):
         # cannot simply copy child analysis, because instructions are simplified through De Morgan
         # invert the desired outcome, but also invert the explanation in case of mismatch
         # for loose coupling, just tell child that parent is a negation
-        ((child_overall,child_analysis),child_next_check_number) = self.negated_predicate.check_submission(submission,student_path,model_path,not desired_outcome,init_check_number,parent_is_negation=True)
-        return ((not child_overall,child_analysis),child_next_check_number)
+        child_analysis = self.negated_predicate.check_submission(submission,student_path,model_path,not desired_outcome,init_check_number,parent_is_negation=True)
+        return OutcomeAnalysis(outcome=not child_analysis.outcome,outcomes_components=child_analysis.outcomes_components,child_analysis.successor_component_number)
 
 class ConjunctiveCheck(CheckingPredicate):
 
@@ -102,14 +112,13 @@ class ConjunctiveCheck(CheckingPredicate):
 
     def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
         exit_code = True # assume
-        # positions = ConjunctiveCheckConjunctPosition.objects.filter(conjunction=self).order_by('order')
         next_check_number = init_check_number + 1
         analysis_children = []
         for conjunct in self.conjuncts:
             if exit_code:
-                ((child_result,child_analysis), next_check_number) = conjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
-                analysis_children += child_analysis
-                exit_code = exit_code and child_result
+                outcome_analysis_child = conjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
+                analysis_children += outcome_analysis_child.components
+                exit_code = exit_code and outcome_analysis_child.outcome
             else:
                 # still need to do this due to short circuiting and numbering, but don't run check
                 # could add non-SC variant later on...
@@ -120,9 +129,7 @@ class ConjunctiveCheck(CheckingPredicate):
                 error_msg = f"AND moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"OR moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return ((exit_code,\
-                 [(init_check_number,exit_code,desired_outcome,"text" if exit_code != desired_outcome else None,error_msg)] + analysis_children),
-                next_check_number)
+        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg)] + analysis_children,successor_component_number=next_check_number)
 
 class FileExistsCheck(CheckingPredicate):
 
@@ -152,14 +159,12 @@ class FileExistsCheck(CheckingPredicate):
             extra_info = f"{entry} moet bestaan, maar bestaat niet"
         else:
             extra_info = None
-        return ((outcome,\
-                 [(init_check_number,\
-                   outcome,\
-                   desired_outcome,\
-                   # geen renderer als alles zoals verwacht is
-                   None if outcome == desired_outcome else "text",\
-                   extra_info)]),\
-                init_check_number + 1)
+        components = [OutcomeComponent(component_number=init_check_number,
+                                       outcome=outcome,
+                                       desired_outcome=desired_outcome,
+                                       renderer=None if outcome == desired_outcome else "text",
+                                       extra_info)]
+        return OutcomeAnalysis(outcome=outcome,outcomes_components=components,successor_component_number=init_check_number+1)
 
 class DisjunctiveCheck(CheckingPredicate):
 
@@ -196,9 +201,9 @@ class DisjunctiveCheck(CheckingPredicate):
         analysis_children = []
         for disjunct in self.disjuncts:
             if not exit_code:
-                ((child_result,child_analysis), next_check_number) = disjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
-                analysis_children += child_analysis
-                exit_code = exit_code or child_result
+                outcome_analysis_child = disjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
+                analysis_children += outcome_analysis_child.components
+                exit_code = exit_code or outcome_analysis_child.outcome
             else:
                 # still need to do this due to short circuiting and numbering, but don't run check
                 # could add non-SC variant later on...
@@ -209,9 +214,7 @@ class DisjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"AND moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return ((exit_code,\
-                 [(init_check_number,exit_code,desired_outcome,"text" if exit_code != desired_outcome else None,error_msg)] + analysis_children),
-                next_check_number)
+        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg)] + analysis_children,successor_component_number=next_check_number)
 
 class BatchType:
     """Elementair batchtype.
@@ -250,26 +253,19 @@ class Strategy:
         return (ref_instructions,acc_instructions)
  
     def check_submission(self,submission,student_path,model_path):
-        # new format analysis is
-        # 1) number of instruction in instruction parse tree under depth-first traversal, ignoring negations, using None for other errors
-        # 2) actual outcome
-        # 3) expected outcome
-        # 4) format name for extra explanation (or None if explanation is None)
-        # 5) explanation in said format (or None)
         (outcome_refusing,analysis_refusing) = (None,[])
         (outcome_accepting,analysis_accepting) = (None,[])
         try:
-            ((outcome_refusing,analysis_refusing),init_accepting_check_number) = self.refusing_check.check_submission(submission,student_path,model_path,desired_outcome=False,init_check_number=1)
-            if outcome_refusing:
-                return (SubmissionState.NEW_REFUSED,analysis_refusing)
-            ((outcome_accepting,analysis_accepting),_) = self.accepting_check.check_submission(submission,student_path,model_path,desired_outcome=True,init_check_number=init_accepting_check_number)
+            outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,model_path,desired_outcome=False,init_check_number=1)
+            if outcome_analysis_refusing.outcome:
+                return (SubmissionState.NEW_REFUSED,outcome_analysis_refusing.components)
+            outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,model_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.successor_component_number)
             if outcome_accepting:
-                return (SubmissionState.ACCEPTED,analysis_accepting)
+                return (SubmissionState.ACCEPTED,outcome_analysis_accepting.components)
         except Exception as e:
             logger.exception('Fout bij controle submissie: %s',e)
-        print(f'Submissie die niet beslist kon worden. Outcome refusing was {outcome_refusing} en outcome accepting was {outcome_accepting}')
         logger.warning(f'Submissie die niet beslist kon worden. Outcome refusing was {outcome_refusing} en outcome accepting was {outcome_accepting}')
-        return (SubmissionState.PENDING,[(None,None,None,"text",f"Het systeem kan niet automatisch bepalen of je inzending klopt. De lector wordt verwittigd. Weigering was {outcome_refusing} en aanvaarding was {outcome_accepting}")] + analysis_refusing + analysis_accepting)
+        return (SubmissionState.PENDING,[OutcomeComponent(component_number=None,outcome=None,desired_outcome=None,renderer="text",renderer_data=f"Het systeem kan niet automatisch bepalen of je inzending klopt. De lector wordt verwittigd. Weigering was {outcome_analysis_refusing.outcome} en aanvaarding was {outcome_analysis_accepting.outcome}")] + outcome_analysis_refusing.components + outcome_analysis_accepting.components)
 
 # order is important for selection dropdowns
 batch_types = [BatchType] + list(BatchType.__subclasses__())
