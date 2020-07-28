@@ -1,10 +1,6 @@
 from .models import SubmissionState
 import logging
 import os
-from antlr4 import *
-from .MultipleChoiceLexer import MultipleChoiceLexer
-from .MultipleChoiceParser import MultipleChoiceParser
-from .MultipleChoiceChecker import MultipleChoiceChecker
 
 logger = logging.getLogger(__name__)
 
@@ -154,88 +150,6 @@ class FileExistsCheck(CheckingPredicate):
             extra_info = f"{entry} mag niet bestaan en bestaat toch"
         elif not outcome and desired_outcome:
             extra_info = f"{entry} moet bestaan, maar bestaat niet"
-        else:
-            extra_info = None
-        return ((outcome,\
-                 [(init_check_number,\
-                   outcome,\
-                   desired_outcome,\
-                   # geen renderer als alles zoals verwacht is
-                   None if outcome == desired_outcome else "text",\
-                   extra_info)]),\
-                init_check_number + 1)
-
-class MultipleChoiceFormatCheck(CheckingPredicate):
-
-    def mentioned_files(self,exercise_name):
-        return set(exercise_name + '.mc')
-
-    def instructions(self,exercise_name,init_check_number):
-        # TODO: moet hier links,... kunnen invoegen...
-        return ([f'Je multiple choice bestand volgt <HET AFGESPROKEN FORMAAT>.'],init_check_number + 1)
-
-    def negative_instructions(self,exercise_name,init_check_number):
-        return ([f'Je multiple choice bestand volgt <HET AFGESPROKEN FORMAAT> niet.'],init_check_number + 1)
-
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
-        # TODO: is dit de geschikte plaats voor exception handling of niet?
-        # hier moeten we ja/nee zeggen en de relatie tot gewenste uitkomst geven
-        # is niet duidelijk bij gelijk welke exception, dus beter niveau hoger afhandelen?
-        input_stream = FileStream(os.path.join(student_path,f'{submission.content_uid}.mc'))
-        lexer = MultipleChoiceLexer(input_stream)
-        stream = CommonTokenStream(lexer)
-        parser = MultipleChoiceParser(stream)
-        tree = parser.multiplechoice()
-        outcome = parser.getNumberOfSyntaxErrors() == 0
-        if outcome and not desired_outcome:
-            extra_info = f"Je multiple choice bestand volgt het afgesproken formaat en dat mag niet"
-        elif not outcome and desired_outcome:
-            extra_info = f"Je multiple choice bestand volgt het afgesproken formaat niet en dat moet juist wel"
-        else:
-            extra_info = None
-        return ((outcome,\
-                 [(init_check_number,\
-                   outcome,\
-                   desired_outcome,\
-                   # geen renderer als alles zoals verwacht is
-                   None if outcome == desired_outcome else "text",\
-                   extra_info)]),\
-                init_check_number + 1)
-
-class MultipleChoiceAnswerCheck(CheckingPredicate):
-
-    def __init__(self,mc_data):
-        self.mc_data = mc_data
-
-    def mentioned_files(self,exercise_name):
-        return set(exercise_name + '.mc')
-
-    def instructions(self,exercise_name,init_check_number):
-        return ([f'Je hebt alle correcte antwoorden per vraag aangeduid.'],init_check_number + 1)
-
-    def negative_instructions(self,exercise_name,init_check_number):
-        return ([f'Je hebt niet alle correcte antwoorden per vraag aangeduid.'],init_check_number + 1)
-
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
-        # TODO: in veronderstelling dat parsen lukt -> listener (of visitor) voorzien van de mc_data
-        # TODO: is dit de geschikte plaats voor exception handling of niet?
-        # moet bij elke vraag nummer controleren (moet volgen op vorig, dat begint bij 0)
-        # moet bij elke vraag controleren of de antwoorden (na lower case) voorkomen in de reeks antwoorden
-        # hier moeten we ja/nee zeggen en de relatie tot gewenste uitkomst geven
-        # is niet duidelijk bij gelijk welke exception, dus beter niveau hoger afhandelen?
-        input_stream = FileStream(os.path.join(student_path,f'{submission.content_uid}.mc'))
-        lexer = MultipleChoiceLexer(input_stream)
-        stream = CommonTokenStream(lexer)
-        parser = MultipleChoiceParser(stream)
-        tree = parser.multiplechoice()
-        checker = MultipleChoiceChecker(self.mc_data)
-        walker = ParseTreeWalker()
-        walker.walk(checker,tree)
-        outcome = len(checker.error_list) == 0
-        if outcome and not desired_outcome:
-            extra_info = f"Je hebt geen enkel fout antwoord aangeduid."
-        elif not outcome and desired_outcome:
-            extra_info = "\n".join([f"Je hebt volgende fouten:"] + checker.error_list)
         else:
             extra_info = None
         return ((outcome,\

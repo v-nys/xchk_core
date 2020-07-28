@@ -5,7 +5,6 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseServerError
-from antlr4 import *
 from .forms import RepoSelectionForm, BatchTypeForm
 from . import strats, courses
 from . import courses

@@ -1,7 +1,5 @@
 from django.db import models
 from django_enumfield import enum
-from polymorphic.models import PolymorphicModel
-from dbchecker.users.models import User
 import datetime
 import pytz
 import logging
@@ -24,7 +22,7 @@ class FeedbackType(enum.Enum):
 
 class FeedbackTicket(models.Model):
     feedback_type = enum.EnumField(FeedbackType, null=False, blank=False)
-    sender = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     # course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
     # node = models.ForeignKey(Node, on_delete=models.CASCADE, null=True, blank=True)
     message = models.TextField(null=False, blank=False)
@@ -39,7 +37,7 @@ class FeedbackTicket(models.Model):
 
 class Repo(models.Model):
     url = models.CharField(null=False,blank=False,max_length=500)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='repos')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='repos')
     # cursussen staan niet in de DB als data, dus kunnen niet linken via foreign key
     # de naam van de cursus moet dienen als referentie
     course = models.CharField(null=False,blank=False,max_length=500)
@@ -55,7 +53,7 @@ class SubmissionV2(models.Model):
     timestamp = models.DateTimeField()
     repo = models.ForeignKey(Repo, null=False, on_delete=models.CASCADE)
     state = enum.EnumField(SubmissionState, default=SubmissionState.PENDING)
-    submitter = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+    submitter = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     feedback = models.TextField(null=True,blank=True)
     content_uid = models.CharField(max_length=40,null=False)
 

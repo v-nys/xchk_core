@@ -8,49 +8,13 @@ from django.urls import reverse_lazy, reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib import messages
 import datetime
-import mistune
-from mistune.directives import Admonition
 import re
 import requests
 import itertools
-from graphviz import Digraph
-import graphviz as gv
 from .forms import CheckRequestFormSet, RepoSelectionForm, BatchTypeForm, FeedbackForm
 from .models import Repo, SubmissionState
-from .renderers import BootstrapAdmonitionRenderer
 from . import courses
 from django.forms import ChoiceField
-
-
-def _instructions_2_md(lst_or_str,margin=-2):
-    # lijst zonder instructies wordt lege string → kan eigenlijk niet, maar is oké voor recursieve oproep
-    if lst_or_str == []:
-        return ""
-    elif isinstance(lst_or_str,str):
-    # bij string wordt marge getekend en wordt dan element gezet met bullet
-        return (" " * margin) + f"* {lst_or_str}\n"
-    else:
-    # bij lijst wordt marge eerst verhoogd en worden dan elementen getoond
-        return "".join([_instructions_2_md(elem,margin+2) for elem in lst_or_str])
-
-def courses_view(request):
-    graphs = []
-    for (course,graph) in courses.course_graphs().items():
-        for v in graph.vs:
-            uid = v["contentview"].uid
-            if uid != 'impossible_node':
-                v["URL"] = reverse(f'{uid}_view')
-            else:
-                v["URL"] = reverse(f'checkerapp:{uid}_view')
-        graph.write_dot(f'/tmp/{course}.gv')
-        with open(f'/tmp/{course}.gv') as fh:
-            dotfile = fh.read()
-            print(dotfile)
-            outpath = gv.render('dot','svg',f'/tmp/{course}.gv')
-            with open(outpath) as fh2:
-                graphs.append(fh2.read())
-    return render(request,'checkerapp/course_overview2.html',{'graphs':graphs})
-
 
 @login_required
 def submission_view(request,submission_pk):
