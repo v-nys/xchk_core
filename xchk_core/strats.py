@@ -163,7 +163,7 @@ class FileExistsCheck(CheckingPredicate):
                                        outcome=outcome,
                                        desired_outcome=desired_outcome,
                                        renderer=None if outcome == desired_outcome else "text",
-                                       extra_info)]
+                                       renderer_data=extra_info)]
         return OutcomeAnalysis(outcome=outcome,outcomes_components=components,successor_component_number=init_check_number+1)
 
 class DisjunctiveCheck(CheckingPredicate):
