@@ -6,6 +6,8 @@ from .models import SubmissionState
 
 logger = logging.getLogger(__name__)
 
+# TODO: consider merging two dataclasses into single composite?
+# note: components are currently stored in a flat list...
 @dataclass
 class OutcomeComponent:
     component_number: int
