@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import django_enumfield.db.fields
-import xchk.models
+import xchk_core.models
 
 
 class Migration(migrations.Migration):
@@ -34,10 +34,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('checksum', models.CharField(max_length=40, null=True)),
                 ('timestamp', models.DateTimeField()),
-                ('state', django_enumfield.db.fields.EnumField(default=1, enum=xchk.models.SubmissionState)),
+                ('state', django_enumfield.db.fields.EnumField(default=1, enum=xchk_core.models.SubmissionState)),
                 ('feedback', models.TextField(blank=True, null=True)),
                 ('content_uid', models.CharField(max_length=40)),
-                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='xchk.Repo')),
+                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='xchk_core.Repo')),
                 ('submitter', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
             name='FeedbackTicket',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('feedback_type', django_enumfield.db.fields.EnumField(enum=xchk.models.FeedbackType)),
+                ('feedback_type', django_enumfield.db.fields.EnumField(enum=xchk_core.models.FeedbackType)),
                 ('message', models.TextField()),
                 ('timestamp', models.DateTimeField()),
                 ('sender', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),

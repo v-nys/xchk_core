@@ -1,1 +1,1 @@
-default_app_config = 'xchk.apps.CheckerappConfig'
+default_app_config = 'xchk_core.apps.CheckerappConfig'
