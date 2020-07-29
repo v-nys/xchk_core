@@ -1,26 +1,13 @@
 import logging
 import os
-from dataclasses import dataclass
-from typing import List,Any
+from collections import namedtuple
 from .models import SubmissionState
 
 logger = logging.getLogger(__name__)
 
-# TODO: consider merging two dataclasses into single composite?
-# note: components are currently stored in a flat list...
-@dataclass
-class OutcomeComponent:
-    component_number: int
-    outcome: bool
-    desired_outcome: bool
-    renderer: str
-    renderer_data: Any
-
-@dataclass
-class OutcomeAnalysis:
-    outcome: bool
-    outcomes_components: List[OutcomeComponent]
-    successor_component_number: int
+# TODO: consider merging into a single composite
+OutcomeComponent = namedtuple('OutcomeComponent', ['component_number','outcome','desired_outcome','renderer','renderer_data'])
+OutcomeAnalysis = namedtuple('OutcomeAnalysis', ['outcome','outcomes_components','successor_component_number'])
 
 class CheckingPredicate:
 
