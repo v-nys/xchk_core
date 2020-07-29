@@ -1,6 +1,5 @@
 from django import forms
 from .models import Repo, FeedbackTicket
-from . import checks
 from . import strats
 
 class CheckRequestForm(forms.Form):
