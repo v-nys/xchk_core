@@ -1,0 +1,166 @@
+[[package]]
+category = "main"
+description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
+name = "django"
+optional = false
+python-versions = ">=3.5"
+version = "2.2.14"
+
+[package.dependencies]
+pytz = "*"
+sqlparse = ">=0.2.2"
+
+[package.extras]
+argon2 = ["argon2-cffi (>=16.1.0)"]
+bcrypt = ["bcrypt"]
+
+[[package]]
+category = "main"
+description = "A helper class for handling configuration defaults of packaged apps gracefully."
+name = "django-appconf"
+optional = false
+python-versions = "*"
+version = "1.0.4"
+
+[package.dependencies]
+django = "*"
+
+[[package]]
+category = "main"
+description = "Custom Django field for using enumerations of named constants"
+name = "django-enumfield"
+optional = false
+python-versions = "*"
+version = "2.0.1"
+
+[package.dependencies]
+six = ">=1.10.0"
+
+[package.extras]
+dev = ["black", "isort", "django", "mypy", "django-stubs", "djangorestframework-stubs"]
+
+[[package]]
+category = "main"
+description = "User notification management for the Django web framework"
+name = "pinax-notifications"
+optional = false
+python-versions = "*"
+version = "6.0.0"
+
+[package.dependencies]
+django = ">=2.2"
+django-appconf = ">=1.0.1"
+
+[[package]]
+category = "main"
+description = "High performance graph data structures and algorithms"
+name = "python-igraph"
+optional = false
+python-versions = "*"
+version = "0.8.2"
+
+[package.dependencies]
+texttable = ">=1.6.2"
+
+[package.extras]
+plotting = ["pycairo (>=1.18.0)"]
+
+[[package]]
+category = "main"
+description = "World timezone definitions, modern and historical"
+name = "pytz"
+optional = false
+python-versions = "*"
+version = "2020.1"
+
+[[package]]
+category = "main"
+description = "Python 2 and 3 compatibility utilities"
+name = "six"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "1.15.0"
+
+[[package]]
+category = "main"
+description = "Non-validating SQL parser"
+name = "sqlparse"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "0.3.1"
+
+[[package]]
+category = "main"
+description = "module for creating simple ASCII tables"
+name = "texttable"
+optional = false
+python-versions = "*"
+version = "1.6.2"
+
+[metadata]
+content-hash = "8def87c667d0d558bcf74e153ff41661afa7e69962f15b0d0605128614e9c57c"
+lock-version = "1.0"
+python-versions = "^3.7"
+
+[metadata.files]
+django = [
+    {file = "Django-2.2.14-py3-none-any.whl", hash = "sha256:f2250bd35d0f6c23e930c544629934144e5dd39a4c06092e1050c731c1712ba8"},
+    {file = "Django-2.2.14.tar.gz", hash = "sha256:edf0ecf6657713b0435b6757e6069466925cae70d634a3283c96b80c01e06191"},
+]
+django-appconf = [
+    {file = "django-appconf-1.0.4.tar.gz", hash = "sha256:be58deb54a43d77d2e1621fe59f787681376d3cd0b8bd8e4758ef6c3a6453380"},
+    {file = "django_appconf-1.0.4-py2.py3-none-any.whl", hash = "sha256:1b1d0e1069c843ebe8ae5aa48ec52403b1440402b320c3e3a206a0907e97bb06"},
+]
+django-enumfield = [
+    {file = "django-enumfield-2.0.1.tar.gz", hash = "sha256:867aa4ac96b58c4834ce060402da5e14b41366806a1cd89170567c4c4f93a626"},
+    {file = "django_enumfield-2.0.1-py2.py3-none-any.whl", hash = "sha256:bb8fb54253b98c0923d29c3492715bf76d22ea183f7482fc60f005436b4240e0"},
+]
+pinax-notifications = [
+    {file = "pinax-notifications-6.0.0.tar.gz", hash = "sha256:ca6effcab2cdc5b9863b9434fd8c78ae7738b0c2b94aec28c25730aa4ff50578"},
+    {file = "pinax_notifications-6.0.0-py3-none-any.whl", hash = "sha256:e86d96fc69d2b2d2feae4a4bfc715b35c88a5fb6fcf8f569264559465fd6e367"},
+]
+python-igraph = [
+    {file = "python-igraph-0.8.2.tar.gz", hash = "sha256:4601638d7d22eae7608cdf793efac75e6c039770ec4bd2cecf76378c84ce7d72"},
+    {file = "python_igraph-0.8.2-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:f3c80579ffb3be1d5052859170ea88f24f928f69a9de69f0ee0a523b0bd5c113"},
+    {file = "python_igraph-0.8.2-cp27-cp27m-manylinux2010_i686.whl", hash = "sha256:4fa304ca9b7db27ba317bb7611687b4cfef5e61bbe6398669bae7057bd64222a"},
+    {file = "python_igraph-0.8.2-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:cf28d5f654afe261dd4b3e7e316fd6e57344e49fff3059b00f200a09b8b13d64"},
+    {file = "python_igraph-0.8.2-cp27-cp27m-win_amd64.whl", hash = "sha256:9ab98510268acca0b1ea09a5b0700d90f2b14d2d2d7f6620dac206b957a4fa37"},
+    {file = "python_igraph-0.8.2-cp27-cp27mu-manylinux2010_i686.whl", hash = "sha256:20c1bc35e3fecdefec6f3ae64bf85ea9e609b251cc4c9e86939cf22469c01a57"},
+    {file = "python_igraph-0.8.2-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:df9df004db7b05051163dd757f7a0c324f50671519b2b2bace59688960bea873"},
+    {file = "python_igraph-0.8.2-cp35-cp35m-macosx_10_6_intel.whl", hash = "sha256:f55208d2dfad311685c501b4f57499cd99fa693e584b943548d7d308c175bdfe"},
+    {file = "python_igraph-0.8.2-cp35-cp35m-manylinux2010_i686.whl", hash = "sha256:6acb16430233d71fa6be8aab360a1a7ee06f25252ed0815e09058e193b51a82d"},
+    {file = "python_igraph-0.8.2-cp35-cp35m-manylinux2010_x86_64.whl", hash = "sha256:029269a05ba1175fb5d5fffa425ed9e66037f36fac30cd8ad5f413eccf2f848e"},
+    {file = "python_igraph-0.8.2-cp35-cp35m-win32.whl", hash = "sha256:5bedd9cbde241c06208b31fe40448343227067e72b5b899971aa2db32199d3b4"},
+    {file = "python_igraph-0.8.2-cp35-cp35m-win_amd64.whl", hash = "sha256:158d85f544f794615e155d6d2d71bbb788d31ceddb1b462b8de039d672ff32b7"},
+    {file = "python_igraph-0.8.2-cp36-cp36m-macosx_10_6_intel.whl", hash = "sha256:e441b4436eb37e9219a9c9f1652e501920bea92898a36b29a3429d4faaf11e3c"},
+    {file = "python_igraph-0.8.2-cp36-cp36m-manylinux2010_i686.whl", hash = "sha256:040f5616fef558abc3833a9c61c9d7d6587ea2c94cd9300ed6e276472f6a04fb"},
+    {file = "python_igraph-0.8.2-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:235cd23d0189d50bb671ab50dee1b64c1f7a0e04ffa5e07bf3c43301487d3d3f"},
+    {file = "python_igraph-0.8.2-cp36-cp36m-win32.whl", hash = "sha256:1b152f65c18231f27786bacbfa988de2ad980632bf7838dbfd1677de63d37015"},
+    {file = "python_igraph-0.8.2-cp36-cp36m-win_amd64.whl", hash = "sha256:e7fb5953bb6410d2c9ee8983583d9e8a81ed2201ade620e352ebe2e3801bf046"},
+    {file = "python_igraph-0.8.2-cp37-cp37m-macosx_10_6_intel.whl", hash = "sha256:d61df94e1ff83b6fda072d40c2e897547ed4e1f98a1ac10242b409adf1233ebd"},
+    {file = "python_igraph-0.8.2-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:92c8e2f9191e7e918ad9eb436188e7d6f951c3b31309b08579889250120e50cb"},
+    {file = "python_igraph-0.8.2-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:0793223cabe711837611ba3e4ace50534c9cb5c87c58fa3204c52b65acfe375e"},
+    {file = "python_igraph-0.8.2-cp37-cp37m-win32.whl", hash = "sha256:c1c3c09ca32ff82e9877ef89e4fea0fc4e17d179fc1078a3ef003aa7a3ffab25"},
+    {file = "python_igraph-0.8.2-cp37-cp37m-win_amd64.whl", hash = "sha256:e72200ac61b54928306b7dad7d52de0f6b1e6beb5d189cd7bc870d183051453a"},
+    {file = "python_igraph-0.8.2-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:2b648c9890bdd9e752da2d42274348528a36e8b50d568a998e33f39f7c61f897"},
+    {file = "python_igraph-0.8.2-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:3eb4127337d81812356e1ddfa60d3c059fafb5906769cc8db100ae74edfab3c5"},
+    {file = "python_igraph-0.8.2-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:288bb940ac7be17f6fed37a19e059aad4b19eb76de0051fbc77fcb66b1cffaa2"},
+    {file = "python_igraph-0.8.2-cp38-cp38-win32.whl", hash = "sha256:6f81572dfdd215aa52ceba621e64a4f1e4c56806236afac662b04b4fce127fb1"},
+    {file = "python_igraph-0.8.2-cp38-cp38-win_amd64.whl", hash = "sha256:637ff1b85c1480d77bb4fb973eebb70524a79a84c3c0fa296996a0d91b3fa4cb"},
+]
+pytz = [
+    {file = "pytz-2020.1-py2.py3-none-any.whl", hash = "sha256:a494d53b6d39c3c6e44c3bec237336e14305e4f29bbf800b599253057fbb79ed"},
+    {file = "pytz-2020.1.tar.gz", hash = "sha256:c35965d010ce31b23eeb663ed3cc8c906275d6be1a34393a1d73a41febf4a048"},
+]
+six = [
+    {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
+    {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
+]
+sqlparse = [
+    {file = "sqlparse-0.3.1-py2.py3-none-any.whl", hash = "sha256:022fb9c87b524d1f7862b3037e541f68597a730a8843245c349fc93e1643dc4e"},
+    {file = "sqlparse-0.3.1.tar.gz", hash = "sha256:e162203737712307dfe78860cc56c8da8a852ab2ee33750e33aeadf38d12c548"},
+]
+texttable = [
+    {file = "texttable-1.6.2-py2.py3-none-any.whl", hash = "sha256:7dc282a5b22564fe0fdc1c771382d5dd9a54742047c61558e071c8cd595add86"},
+    {file = "texttable-1.6.2.tar.gz", hash = "sha256:eff3703781fbc7750125f50e10f001195174f13825a92a45e9403037d539b4f4"},
+]
