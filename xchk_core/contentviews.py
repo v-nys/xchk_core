@@ -16,7 +16,7 @@ class ContentView(View,LoginRequiredMixin):
     # FIXME: wil hier eigenlijk abstract class properties van maken, maar weet niet zeker hoe
     uid = 'aanvullen'
     strat = strats.Strategy()
-    template = 'aanvullen.html'
+    template = 'maaktnietuit.html'
     custom_data = {}
 
     @classmethod
