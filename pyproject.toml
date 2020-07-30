@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xchk-core"
-version = "0.1.0"
+version = "0.1.2"
 description = "Core functionality for the xchk teaching framework"
 authors = ["Vincent Nys <vincentnys@gmail.com>"]
 license = "MIT"
@@ -11,6 +11,7 @@ django = "^2.2"
 django-enumfield = "^2.0.1"
 python-igraph = "^0.8.2"
 pinax-notifications = "^6.0.0"
+graphviz = "^0.14.1"
 
 [tool.poetry.dev-dependencies]
 
