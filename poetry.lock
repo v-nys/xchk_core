@@ -41,6 +41,19 @@ dev = ["black", "isort", "django", "mypy", "django-stubs", "djangorestframework-
 
 [[package]]
 category = "main"
+description = "Simple Python interface for Graphviz"
+name = "graphviz"
+optional = false
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
+version = "0.14.1"
+
+[package.extras]
+dev = ["tox (>=3)", "flake8", "pep8-naming", "wheel", "twine"]
+docs = ["sphinx (>=1.8)", "sphinx-rtd-theme"]
+test = ["mock (>=3)", "pytest (>=4)", "pytest-mock (>=2)", "pytest-cov"]
+
+[[package]]
+category = "main"
 description = "User notification management for the Django web framework"
 name = "pinax-notifications"
 optional = false
@@ -98,7 +111,7 @@ python-versions = "*"
 version = "1.6.2"
 
 [metadata]
-content-hash = "8def87c667d0d558bcf74e153ff41661afa7e69962f15b0d0605128614e9c57c"
+content-hash = "43a1d4272324e8a87471cfa9fc396ea630f0aa4535dc09b7c27ec2a135d5467b"
 lock-version = "1.0"
 python-versions = "^3.7"
 
@@ -114,6 +127,10 @@ django-appconf = [
 django-enumfield = [
     {file = "django-enumfield-2.0.1.tar.gz", hash = "sha256:867aa4ac96b58c4834ce060402da5e14b41366806a1cd89170567c4c4f93a626"},
     {file = "django_enumfield-2.0.1-py2.py3-none-any.whl", hash = "sha256:bb8fb54253b98c0923d29c3492715bf76d22ea183f7482fc60f005436b4240e0"},
+]
+graphviz = [
+    {file = "graphviz-0.14.1-py2.py3-none-any.whl", hash = "sha256:088562ef6e3dad5e8dde9389caf4a84f768e65dcaa08238cfcdf36d2b30ccf61"},
+    {file = "graphviz-0.14.1.zip", hash = "sha256:f5aad52a652c06825dcc5ee018d920fca26aef339386866094597fb3f2f222ce"},
 ]
 pinax-notifications = [
     {file = "pinax-notifications-6.0.0.tar.gz", hash = "sha256:ca6effcab2cdc5b9863b9434fd8c78ae7738b0c2b94aec28c25730aa4ff50578"},
