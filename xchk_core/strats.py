@@ -9,20 +9,34 @@ logger = logging.getLogger(__name__)
 OutcomeComponent = namedtuple('OutcomeComponent', ['component_number','outcome','desired_outcome','renderer','renderer_data'])
 OutcomeAnalysis = namedtuple('OutcomeAnalysis', ['outcome','outcomes_components','successor_component_number'])
 
+# TODO: replace (negative_)instructions boilerplate for implicit case with something like a decorator?
+
 class CheckingPredicate:
 
-    """Intended to be overwritten in subclasses. Default checking strategy always accepts so has no instructions."""
+    def __init__(self,implicit=False):
+        self.implicit = implicit
+
+    def has_implicit_components(self):
+        """Tells us whether any component of this check is implicit."""
+        # most checks are atomic, so this is a sane default
+        return self.implicit
+
     def instructions(self,exercise_name,init_check_number):
+        """Intended to be overwritten in subclasses. Default checking strategy always accepts so has no instructions."""
+        if self.implicit:
+            return ([], init_check_number)
         return ([f"True"], init_check_number + 1)
 
     def negative_instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
         return ([f"False"], init_check_number + 1)
 
     def component_checks(self):
         return []
 
-    """This is here so we can easily check submitted relevant files through UI."""
     def mentioned_files(self,exercise_name):
+        """This is here so we can easily check submitted relevant files through UI."""
         return set()
 
     # alle properties moeten gelijk zijn en klasse moet gelijk zijn
@@ -47,13 +61,21 @@ class TrueCheck(CheckingPredicate):
 
 class Negation(CheckingPredicate):
 
-    def __init__(self,negated):
+    def __init__(self,negated,implicit=False):
+        super().__init__(implicit)
         self.negated_predicate = negated
 
+    def has_implicit_components(self):
+        return self.negated_predicate.has_implicit_components()
+
     def negative_instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
         return self.negated_predicate.instructions(exercise_name,init_check_number)
 
     def instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
         return self.negated_predicate.negative_instructions(exercise_name,init_check_number)
 
     def component_checks(self):
@@ -72,28 +94,40 @@ class Negation(CheckingPredicate):
 
 class ConjunctiveCheck(CheckingPredicate):
 
-    def __init__(self,conjuncts):
+    def __init__(self,conjuncts,implicit=False):
+        super().__init__(implicit)
         self.conjuncts = conjuncts
+
+    def has_implicit_components(self):
+        return any((c.has_implicit_components() for c in self.conjuncts))
 
     def mentioned_files(self,exercise_name):
         return set([fn for conjunct in self.conjuncts for fn in conjunct.mentioned_files(exercise_name)])
 
     def instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
         subinstructions = []
         next_init_check_number = init_check_number + 1
         for conjunct in self.conjuncts:
-            (subinstruction_info,next_init_check_number) = conjunct.instructions(exercise_name,next_init_check_number)
-            subinstructions.append(subinstruction_info)
+            if not conjunct.implicit:
+                (subinstruction_info,next_init_check_number) = conjunct.instructions(exercise_name,next_init_check_number)
+                subinstructions.append(subinstruction_info)
+        # TODO: indien maar één (expliciete) voorwaarde, dan kunnen we filteren
         return (["Aan al volgende voorwaarden is voldaan:"] + subinstructions,next_init_check_number)
 
     def negative_instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
         subinstructions = []
         next_init_check_number = init_check_number + 1
         for conjunct in self.conjuncts:
             # note use of `negative_instructions`
             # De Morgan's law applied to conjunction
-            (subinstruction_info,next_init_check_number) = conjunct.negative_instructions(exercise_name,next_init_check_number)
-            subinstructions.append(subinstruction_info)
+            if not conjunct.implicit:
+                (subinstruction_info,next_init_check_number) = conjunct.negative_instructions(exercise_name,next_init_check_number)
+                subinstructions.append(subinstruction_info)
+        # TODO: indien maar één (expliciete) voorwaarde, dan kunnen we filteren
         return (['Aan minstens één van volgende voorwaarden is voldaan:'] + subinstructions,next_init_check_number)
 
     def component_checks(self):
@@ -122,7 +156,8 @@ class ConjunctiveCheck(CheckingPredicate):
 
 class FileExistsCheck(CheckingPredicate):
 
-    def __init__(self,name=None,extension=None):
+    def __init__(self,name=None,extension=None,implicit=False):
+        super().__init__(implicit)
         self.name = name
         self.extension = extension
 
@@ -133,9 +168,13 @@ class FileExistsCheck(CheckingPredicate):
         return set(self.entry(exercise_name))
 
     def instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
         return ([f'Je hebt een bestand met naam {self.entry(exercise_name)}'],init_check_number + 1)
 
     def negative_instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
         return ([f'Je hebt geen bestand met naam {self.entry(exercise_name)}'],init_check_number + 1)
 
     def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
@@ -157,21 +196,32 @@ class FileExistsCheck(CheckingPredicate):
 
 class DisjunctiveCheck(CheckingPredicate):
 
-    def __init__(self,disjuncts):
+    def __init__(self,disjuncts,implicit=False):
+        super().__init__(implicit)
         self.disjuncts = disjuncts
+
+    def has_implicit_components(self):
+        return any((c.has_implicit_components() for c in self.disjuncts))
 
     def mentioned_files(self,exercise_name):
         return set([fn for disjunct in self.disjuncts for fn in disjunct.mentioned_files(exercise_name)])
 
     def instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
+  
+
         subinstructions = []
         next_init_check_number = init_check_number + 1
         for disjunct in self.disjuncts:
             (subinstruction_info,next_init_check_number) = disjunct.instructions(exercise_name,next_init_check_number)
             subinstructions.append(subinstruction_info)
+        # TODO: indien maar één (expliciete) voorwaarde, dan kunnen we filteren
         return (["Aan minstens een van volgende voorwaarden is voldaan:"] + subinstructions,next_init_check_number)
 
     def negative_instructions(self,exercise_name,init_check_number):
+        if self.implicit:
+            return ([], init_check_number)
         subinstructions = []
         next_init_check_number = init_check_number + 1
         for disjunct in self.disjuncts:
@@ -179,6 +229,7 @@ class DisjunctiveCheck(CheckingPredicate):
             # De Morgan's law applied to disjunction
             (subinstruction_info,next_init_check_number) = disjunct.negative_instructions(exercise_name,next_init_check_number)
             subinstructions.append(subinstruction_info)
+        # TODO: indien maar één (expliciete) voorwaarde, dan kunnen we filteren
         return (['Aan al volgende voorwaarden is voldaan:'] + subinstructions,next_init_check_number)
 
     def component_checks(self):
@@ -238,7 +289,12 @@ class Strategy:
 
     def instructions(self,exercise_name):
         (ref_instructions,ctr) = self.refusing_check.instructions(exercise_name,1)
+        if self.refusing_check.has_implicit_components():
+            ref_instructions.append("Er is voldaan aan verborgen voorwaarden. Het systeem zal je na je inzending verwittigen als dit het geval is.")
+            ctr += 1
         (acc_instructions,_) = self.accepting_check.instructions(exercise_name,ctr)
+        if self.accepting_check.has_implicit_components():
+            acc_instructions.append("Er is voldaan aan verborgen voorwaarden. Het systeem zal je na je inzending verwittigen als dit het geval is.")
         return (ref_instructions,acc_instructions)
  
     def check_submission(self,submission,student_path,model_path):
