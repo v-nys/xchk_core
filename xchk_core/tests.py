@@ -78,11 +78,26 @@ class StrategyInstructionGenerationTest(TestCase):
                                   implicit_accepting_components=False))
 
     def test_implicit_refusing_explicit_accepting_checks(self):
-        self.assertTrue(False)
+        acc_chk = ConjunctiveCheck([TrueCheck(),TrueCheck(),FileExistsCheck(name='myfile',extension='txt')])
+        ref_chk = Negation(ConjunctiveCheck([TrueCheck(),TrueCheck(implicit=True),FileExistsCheck(name='myfile',extension='txt')]))
+        strat = Strategy(ref_chk,acc_chk)
+        self.assertEqual(
+                strat.instructions('dummy_ex'),
+                StratInstructions(refusing=[AT_LEAST_ONE_TEXT,["False"],["Je hebt geen bestand met naam myfile.txt"]],
+                                  implicit_refusing_components=True,
+                                  accepting=[ALL_OF_TEXT,["True"],["True"],["Je hebt een bestand met naam myfile.txt"]],
+                                  implicit_accepting_components=False))
 
     def test_explicit_refusing_implicit_accepting_checks(self):
-        self.assertTrue(False)
-
+        acc_chk = ConjunctiveCheck([TrueCheck(),TrueCheck(implicit=True),FileExistsCheck(name='myfile',extension='txt')])
+        ref_chk = Negation(ConjunctiveCheck([TrueCheck(),TrueCheck(),FileExistsCheck(name='myfile',extension='txt')]))
+        strat = Strategy(ref_chk,acc_chk)
+        self.assertEqual(
+                strat.instructions('dummy_ex'),
+                StratInstructions(refusing=[AT_LEAST_ONE_TEXT,["False"],["False"],["Je hebt geen bestand met naam myfile.txt"]],
+                                  implicit_refusing_components=False,
+                                  accepting=[ALL_OF_TEXT,["True"],["Je hebt een bestand met naam myfile.txt"]],
+                                  implicit_accepting_components=True))
 
 if __name__ == '__main__':
     unittest.main()
