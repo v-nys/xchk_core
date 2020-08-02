@@ -19,7 +19,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'xchk-core',
-    'version': '0.1.7',
+    'version': '0.1.8',
     'description': 'Core functionality for the xchk teaching framework',
     'long_description': None,
     'author': 'Vincent Nys',

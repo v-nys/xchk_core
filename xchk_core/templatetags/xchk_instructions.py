@@ -16,8 +16,6 @@ def iterable(obj):
 
 def _node_instructions_2_ul(instructions):
     instructions = StratInstructions(*instructions)
-    # FIXME: changed input
-    # believe lst_or_str will be a StratInstructions namedtuple, so poorly named
     def _folded(acc,elem):
         (acc_txt,before_ctr) = acc
         (elem_txt,after_ctr) = _aux(elem,before_ctr)
@@ -31,10 +29,14 @@ def _node_instructions_2_ul(instructions):
             (rec_txt,rec_ctr) = functools.reduce(_folded,lst_or_str[1:],("",li_counter+1))
             return (f'<li><a href="#explanation-{li_counter}">{lst_or_str[0]}</a><ul>{rec_txt}</ul></li>',rec_ctr)
     (ref_elems,ctr) = _aux(instructions.refusing,1)
+    if instructions.implicit_refusing_components:
+        ctr += 1
     (acc_elems,ctr) = _aux(instructions.accepting,ctr)
     return f'''<ul>
                  <li>Je oefening wordt geweigerd als:<ul>{ref_elems}</ul></li>
+                 {'<li><a href="#explanation-{ctr}">Impliciete voorwaarden voor weigering zijn voldaan</a></li>'if instructions.implicit_refusing_components else ''}
                  <li>Je oefening wordt aanvaard als:<ul>{acc_elems}</ul></li>
+                 {'<li><a href="#explanation-{ctr}">Impliciete voorwaarden voor aanvaarding zijn voldaan</a></li>'if instructions.implicit_accepting_components else ''}
                </ul>'''
 
 def _nested_conditional_escape(lst):
