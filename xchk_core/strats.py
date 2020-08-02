@@ -27,10 +27,14 @@ class CheckingPredicate:
 
     def instructions(self,exercise_name):
         """Returns a hierarchical representation of the explicit conditions to be met for this check to return `True`."""
+        if self.implicit:
+            return []
         return [f"True"]
 
     def negative_instructions(self,exercise_name):
         """Returns a hierarchical representation of the explicit conditions to be met for this check to return `False`."""
+        if self.implicit:
+            return []
         return [f"False"]
 
     def component_checks(self):
@@ -70,9 +74,13 @@ class Negation(CheckingPredicate):
         return self.negated_predicate.has_implicit_components()
 
     def negative_instructions(self,exercise_name):
+        if self.implicit:
+            return []
         return self.negated_predicate.instructions(exercise_name)
 
     def instructions(self,exercise_name):
+        if self.implicit:
+            return []
         return self.negated_predicate.negative_instructions(exercise_name)
 
     def component_checks(self):
@@ -102,6 +110,8 @@ class ConjunctiveCheck(CheckingPredicate):
         return set([fn for conjunct in self.conjuncts for fn in conjunct.mentioned_files(exercise_name)])
 
     def instructions(self,exercise_name):
+        if self.implicit:
+            return []
         subinstructions = []
         for conjunct in self.conjuncts:
             if not conjunct.implicit:
@@ -110,6 +120,8 @@ class ConjunctiveCheck(CheckingPredicate):
         return [ALL_OF_TEXT] + subinstructions
 
     def negative_instructions(self,exercise_name):
+        if self.implicit:
+            return []
         subinstructions = []
         for conjunct in self.conjuncts:
             # note use of `negative_instructions`
@@ -157,9 +169,13 @@ class FileExistsCheck(CheckingPredicate):
         return set(self.entry(exercise_name))
 
     def instructions(self,exercise_name):
+        if self.implicit:
+            return []
         return [f'Je hebt een bestand met naam {self.entry(exercise_name)}']
 
     def negative_instructions(self,exercise_name):
+        if self.implicit:
+            return []
         return [f'Je hebt geen bestand met naam {self.entry(exercise_name)}']
 
     def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
@@ -192,6 +208,8 @@ class DisjunctiveCheck(CheckingPredicate):
         return set([fn for disjunct in self.disjuncts for fn in disjunct.mentioned_files(exercise_name)])
 
     def instructions(self,exercise_name):
+        if self.implicit:
+            return []
         subinstructions = []
         for disjunct in self.disjuncts:
             subinstructions.append(disjunct.instructions(exercise_name))
@@ -200,7 +218,7 @@ class DisjunctiveCheck(CheckingPredicate):
 
     def negative_instructions(self,exercise_name):
         if self.implicit:
-            return ([], init_check_number)
+            return []
         subinstructions = []
         for disjunct in self.disjuncts:
             # note use of `negative_instructions`
