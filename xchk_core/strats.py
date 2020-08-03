@@ -8,33 +8,19 @@ logger = logging.getLogger(__name__)
 # TODO: consider merging into a single composite
 OutcomeComponent = namedtuple('OutcomeComponent', ['component_number','outcome','desired_outcome','renderer','renderer_data'])
 OutcomeAnalysis = namedtuple('OutcomeAnalysis', ['outcome','outcomes_components','successor_component_number'])
-StratInstructions = namedtuple('StratInstructions', ['refusing','implicit_refusing_components','accepting','implicit_accepting_components'])
+StratInstructions = namedtuple('StratInstructions', ['refusing','accepting'])
 
 AT_LEAST_ONE_TEXT = "Aan minstens één van volgende voorwaarden is voldaan:"
 ALL_OF_TEXT = "Aan al volgende voorwaarden is voldaan:"
 
-# TODO: replace (negative_)instructions boilerplate for implicit case with something like a decorator?
-
 class CheckingPredicate:
-
-    def __init__(self,implicit=False):
-        self.implicit = implicit
-
-    def has_implicit_components(self):
-        """Tells us whether any component of this check is implicit."""
-        # most checks are atomic, so this is a sane default
-        return self.implicit
 
     def instructions(self,exercise_name):
         """Returns a hierarchical representation of the explicit conditions to be met for this check to return `True`."""
-        if self.implicit:
-            return []
         return [f"True"]
 
     def negative_instructions(self,exercise_name):
         """Returns a hierarchical representation of the explicit conditions to be met for this check to return `False`."""
-        if self.implicit:
-            return []
         return [f"False"]
 
     def component_checks(self):
@@ -66,21 +52,13 @@ class TrueCheck(CheckingPredicate):
 
 class Negation(CheckingPredicate):
 
-    def __init__(self,negated,implicit=False):
-        super().__init__(implicit)
+    def __init__(self,negated):
         self.negated_predicate = negated
 
-    def has_implicit_components(self):
-        return self.negated_predicate.has_implicit_components()
-
     def negative_instructions(self,exercise_name):
-        if self.implicit:
-            return []
         return self.negated_predicate.instructions(exercise_name)
 
     def instructions(self,exercise_name):
-        if self.implicit:
-            return []
         return self.negated_predicate.negative_instructions(exercise_name)
 
     def component_checks(self):
@@ -99,36 +77,24 @@ class Negation(CheckingPredicate):
 
 class ConjunctiveCheck(CheckingPredicate):
 
-    def __init__(self,conjuncts,implicit=False):
-        super().__init__(implicit)
+    def __init__(self,conjuncts):
         self.conjuncts = conjuncts
-
-    def has_implicit_components(self):
-        return any((c.has_implicit_components() for c in self.conjuncts))
 
     def mentioned_files(self,exercise_name):
         return set([fn for conjunct in self.conjuncts for fn in conjunct.mentioned_files(exercise_name)])
 
     def instructions(self,exercise_name):
-        if self.implicit:
-            return []
         subinstructions = []
         for conjunct in self.conjuncts:
-            if not conjunct.implicit:
-                subinstructions.append(conjunct.instructions(exercise_name))
-        # TODO: indien maar één (expliciete) voorwaarde, dan kunnen we filteren
+            subinstructions.append(conjunct.instructions(exercise_name))
         return [ALL_OF_TEXT] + subinstructions
 
     def negative_instructions(self,exercise_name):
-        if self.implicit:
-            return []
         subinstructions = []
         for conjunct in self.conjuncts:
             # note use of `negative_instructions`
             # De Morgan's law applied to conjunction
-            if not conjunct.implicit:
-                subinstructions.append(conjunct.negative_instructions(exercise_name))
-        # TODO: indien maar één (expliciete) voorwaarde, dan kunnen we filteren
+            subinstructions.append(conjunct.negative_instructions(exercise_name))
         return [AT_LEAST_ONE_TEXT] + subinstructions
 
     def component_checks(self):
@@ -157,8 +123,7 @@ class ConjunctiveCheck(CheckingPredicate):
 
 class FileExistsCheck(CheckingPredicate):
 
-    def __init__(self,name=None,extension=None,implicit=False):
-        super().__init__(implicit)
+    def __init__(self,name=None,extension=None):
         self.name = name
         self.extension = extension
 
@@ -169,13 +134,9 @@ class FileExistsCheck(CheckingPredicate):
         return set(self.entry(exercise_name))
 
     def instructions(self,exercise_name):
-        if self.implicit:
-            return []
         return [f'Je hebt een bestand met naam {self.entry(exercise_name)}']
 
     def negative_instructions(self,exercise_name):
-        if self.implicit:
-            return []
         return [f'Je hebt geen bestand met naam {self.entry(exercise_name)}']
 
     def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
@@ -197,34 +158,24 @@ class FileExistsCheck(CheckingPredicate):
 
 class DisjunctiveCheck(CheckingPredicate):
 
-    def __init__(self,disjuncts,implicit=False):
-        super().__init__(implicit)
+    def __init__(self,disjuncts):
         self.disjuncts = disjuncts
-
-    def has_implicit_components(self):
-        return any((c.has_implicit_components() for c in self.disjuncts))
 
     def mentioned_files(self,exercise_name):
         return set([fn for disjunct in self.disjuncts for fn in disjunct.mentioned_files(exercise_name)])
 
     def instructions(self,exercise_name):
-        if self.implicit:
-            return []
         subinstructions = []
         for disjunct in self.disjuncts:
             subinstructions.append(disjunct.instructions(exercise_name))
-        # TODO: indien maar één (expliciete) voorwaarde, dan kunnen we filteren
         return [AT_LEAST_ONE_TEXT] + subinstructions
 
     def negative_instructions(self,exercise_name):
-        if self.implicit:
-            return []
         subinstructions = []
         for disjunct in self.disjuncts:
             # note use of `negative_instructions`
             # De Morgan's law applied to disjunction
             subinstructions.append(disjunct.negative_instructions(exercise_name))
-        # TODO: indien maar één (expliciete) voorwaarde, dan kunnen we filteren
         return [ALL_OF_TEXT] + subinstructions
 
     def component_checks(self):
@@ -287,9 +238,7 @@ class Strategy:
         acc_instructions = self.accepting_check.instructions(exercise_name)
         return StratInstructions(
                 refusing=ref_instructions,
-                implicit_refusing_components=self.refusing_check.has_implicit_components(),
-                accepting=acc_instructions,
-                implicit_accepting_components=self.accepting_check.has_implicit_components())
+                accepting=acc_instructions)
  
     def check_submission(self,submission,student_path,model_path):
         (outcome_refusing,analysis_refusing) = (None,[])
