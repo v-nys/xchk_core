@@ -52,11 +52,6 @@ class DisjunctiveCheckInstructionGenerationTest(TestCase):
         chk = Negation(DisjunctiveCheck([TrueCheck(),TrueCheck(),TrueCheck()]))
         self.assertEqual(chk.instructions(None),[ALL_OF_TEXT,["False"],["False"],["False"]])
 
-    @unittest.skip("optimization, can wait")
-    def test_optimizations(self):
-        # TODO: same optimizations as for conjunctions
-        self.assertTrue(False)
-
 class StrategyInstructionGenerationTest(TestCase):
 
     def test_only_explicit_checks(self):
@@ -70,23 +65,27 @@ class StrategyInstructionGenerationTest(TestCase):
 
 class Instructions2HtmlTest(TestCase):
 
-    @unittest.skip("dealing with exact representation of whitespace is painful, use parsed representation")
-    def test_no_element_list(self):
-        # FIXME: think I need a StrategyInstructions object and not a single list here
-        self.assertTrue(False)
-        self.assertEqual(node_instructions_2_ul([],"<ul></ul>"))
+    def setUp(self):
+        self.maxDiff = None
 
-    @unittest.skip("dealing with exact representation of whitespace is painful, use parsed representation")
-    def test_single_element_list(self):
-        # FIXME: think I need a StrategyInstructions object and not a single list here
-        self.assertTrue(False)
-        self.assertEqual(node_instructions_2_ul(["True"],'<ul><li><a href="#explanation-1">True</a></li></ul>'))
-
-    @unittest.skip("dealing with exact representation of whitespace is painful, use parsed representation")
-    def test_flat_list(self):
-        # FIXME: think I need a StrategyInstructions object and not a single list here
-        self.assertTrue(False)
-        self.assertEqual(node_instructions_2_ul(["True","False"],'<ul><li><a href="#explanation-1">True</a></li><li><a href="#explanation-2">False</a></li></ul>'))
+    def test_leaf_node_conditions(self):
+        instructions = StratInstructions(refusing=["False"],accepting=["True"])
+        outcome = node_instructions_2_ul(instructions)
+        intended = '''<ul>
+                        <li>Je oefening wordt geweigerd als:
+                          <ul>
+                            <li><a href="#explanation-1">False</a></li>
+                          </ul>
+                        </li>
+                        <li>Je oefening wordt aanvaard als:
+                          <ul>
+                            <li><a href="#explanation-2">True</a></li>
+                          </ul>
+                        </li>
+                      </ul>'''
+        soup1 = BeautifulSoup(outcome,'html.parser')
+        soup2 = BeautifulSoup(intended,'html.parser')
+        self.assertEqual(soup1.prettify(),soup2.prettify())
 
     def test_nested_list(self):
         instructions = StratInstructions(
