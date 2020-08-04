@@ -9,13 +9,6 @@ class CheckRequestForm(forms.Form):
         numbered_exercises = [(node.pk,str(node)) for node in exercises] # if node.is_accessible_by(user)] uitgeschakeld zodat studenten Bruce alles kunnen checken
         self.fields['exercise'] = forms.ChoiceField(choices=numbered_exercises)
 
-class BatchTypeForm(forms.Form):
-
-    def __init__(self, *args, **kwargs):
-        super(BatchTypeForm,self).__init__(*args,**kwargs)
-        batch_types = [(idx,bt.description) for (idx,bt) in enumerate(strats.batch_types,0)]
-        self.fields['batchtype'] = forms.ChoiceField(choices=batch_types)
-
 class FeedbackForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):

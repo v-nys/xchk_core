@@ -12,7 +12,7 @@ import re
 import requests
 import itertools
 import graphviz as gv
-from .forms import CheckRequestFormSet, RepoSelectionForm, BatchTypeForm, FeedbackForm
+from .forms import CheckRequestFormSet, RepoSelectionForm, FeedbackForm
 from .models import Repo, SubmissionState
 from . import courses
 from django.forms import ChoiceField
@@ -47,10 +47,9 @@ def check_scripts_view(request):
     repos = Repo.objects.filter(user=request.user)
     nodes = Node.objects.all()
     if repos:
-        batchtypeform = BatchTypeForm()
         repoform = RepoSelectionForm(owner=request.user)
         formset = CheckRequestFormSet(form_kwargs={'exercises': nodes, 'user': request.user})
-        return render(request, 'checkerapp/index.html', {'batchtypeform': batchtypeform, 'repoform': repoform, 'formset': formset})
+        return render(request, 'checkerapp/index.html', {'repoform': repoform, 'formset': formset})
     else:
         return redirect('checkerapp:create_repo')
 

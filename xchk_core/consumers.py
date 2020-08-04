@@ -50,6 +50,7 @@ class CheckRequestConsumer(WebsocketConsumer):
         )
 
     def receive(self, text_data):
+        # TODO: can simplify now that exercises are checked one by one
         print(text_data)
         text_data_json = json.loads(text_data)
         # TODO: giving task five minutes, may be able to come up with something more intelligent
@@ -59,7 +60,6 @@ class CheckRequestConsumer(WebsocketConsumer):
         if len(recent_submissions) > 0 and not self.scope['user'].is_superuser:
             self.send(text_data=json.dumps({'last_reached_file': "geen bestand gecontroleerd", "analysis": [(None,None,None,"text","je mag maar één keer per vijftien seconden checken")]}))
             return
-        batchtype = int(text_data_json['batchtype'])
         submissions = []
         with transaction.atomic():
             # TODO: is dit niet wat omslachtig? krijg de UID, ga hem omzetten naar een contentview, om dan hier toch maar gewoon id te geven?
@@ -75,8 +75,7 @@ class CheckRequestConsumer(WebsocketConsumer):
                 submission.save()
                 submissions.append(submission)
         # need to represent repo / submission through their IDs because of serialization
-        check_submission_batch.apply_async(args=[batchtype,\
-                                                 repo.id,\
+        check_submission_batch.apply_async(args=[repo.id,\
                                                  [submission.id for submission in submissions]],\
                                            link=notify_result.s(self.group_name),\
                                            expires=300)

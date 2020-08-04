@@ -5,7 +5,7 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseServerError
-from .forms import RepoSelectionForm, BatchTypeForm
+from .forms import RepoSelectionForm
 from . import strats, courses
 from . import courses
 from .models import SubmissionV2, SubmissionState
@@ -37,13 +37,12 @@ class ContentView(View,LoginRequiredMixin):
         return any((submission.state == SubmissionState.ACCEPTED for submission in submissions))
 
     def get(self,request,*args,**kwargs):
-        batchtypeform = BatchTypeForm()
         repoform = RepoSelectionForm(owner=request.user)
         user = request.user
         if self.__class__.is_accessible_by(user):
             instructions = self.strat.instructions(self.uid)
             print(instructions)
-            return render(request,self.template,{'uid':self.uid,'batchtypeform':batchtypeform,'repoform':repoform,'instructions':instructions,'custom_data':self.custom_data})
+            return render(request,self.template,{'uid':self.uid,'repoform':repoform,'instructions':instructions,'custom_data':self.custom_data})
         else:
             return HttpResponseServerError()
 

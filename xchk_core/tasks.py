@@ -23,8 +23,8 @@ STUDENT_SOLUTION_DIR = '/tmp/studentrepo'
 #              !!! OPGELET !!!             #
 ############################################
 
-def _check_submissions_in_commit(submissions,checksum,batchtype_id):
-    batchtype = strats.batch_types[batchtype_id]
+def _check_submissions_in_commit(submissions,checksum):
+    # TODO: can be simplified further now that batch types are gone
     (exit_code, analysis) = (None,None)
     first_failed_or_unreached_submission = None
     for submission in submissions:
@@ -38,22 +38,8 @@ def _check_submissions_in_commit(submissions,checksum,batchtype_id):
             submission.checksum = checksum
             if exit_code is None or exit_code == SubmissionState.ACCEPTED:
                 strategy = exercise.strat
-                # first check whether all checks are allowed using batch type
-                for check in strategy.component_checks():
-                    allowed = False
-                    for allowed_check in batchtype.allowed_checks:
-                        allowed = allowed or (check == allowed_check)
-                    if not allowed:
-                        # format analysis
-                        # 1) number of problematic instruction in instruction parse tree under depth-first traversal, ignoring negations, using None for other errors
-                        # 2) expected outcome (actual outcome is implied: inverse)
-                        # 3) format name for extra explanation (or None if explanation is None)
-                        # 4) explanation in said format (or None)
-                        (exit_code,analysis) = (SubmissionState.NOT_REACHED,[(None,None,None,"text","Minstens één uit te voeren controle is niet toegelaten door het batchtype.")])
-                # if all checks are allowed, check this submission
-                if exit_code is None or exit_code == SubmissionState.ACCEPTED:
-                    (exit_code,analysis) = exercise.strat.check_submission(submission,STUDENT_SOLUTION_DIR,MODEL_SOLUTION_DIR)
-                    submission.state = exit_code
+                (exit_code,analysis) = strategy.check_submission(submission,STUDENT_SOLUTION_DIR,MODEL_SOLUTION_DIR)
+                submission.state = exit_code
                 if exit_code is not None and exit_code != SubmissionState.ACCEPTED:
                     first_failed_or_unreached_submission = submission
             else:
@@ -66,7 +52,6 @@ def _check_submissions_in_commit(submissions,checksum,batchtype_id):
                 first_failed_or_unreached_submission = submission
         finally:
             submission.save()
-    batchtype.cleanup(STUDENT_SOLUTION_DIR,MODEL_SOLUTION_DIR)
     if first_failed_or_unreached_submission is not None:
         # TODO: zou beter zijn hier een titel te voorzien, maar oké
         return (first_failed_or_unreached_submission.content_uid,analysis)
@@ -74,9 +59,8 @@ def _check_submissions_in_commit(submissions,checksum,batchtype_id):
         return (submissions[-1].content_uid,[]) # empty analysis if everything is okay
 
 @celery_app.task(priority=0)
-def check_submission_batch(batchtype_id,repo_id,submission_ids,*args,**kwargs):
+def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
     # all id's have been queried by consumer, so assume they are okay
-    # batchtype = strats.batch_types[batchtype_id]
     repo = Repo.objects.get(id=repo_id)
     subprocess.run(f'rm -rf {MODEL_SOLUTION_DIR}',shell=True)
     subprocess.run(f'rm -rf {STUDENT_SOLUTION_DIR}',shell=True)
@@ -93,7 +77,7 @@ def check_submission_batch(batchtype_id,repo_id,submission_ids,*args,**kwargs):
     submissions = [SubmissionV2.objects.get(id=submission_id) for submission_id in submission_ids]
     print('gaan over naar subtaak')
     if len(checksum) == 40:
-        return _check_submissions_in_commit(submissions,checksum,batchtype_id)
+        return _check_submissions_in_commit(submissions,checksum)
     else:
         with transaction.atomic():
             for submission in submissions:

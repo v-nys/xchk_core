@@ -202,25 +202,6 @@ class DisjunctiveCheck(CheckingPredicate):
                 error_msg = f"AND moest {not desired_outcome} leveren, leverde {not exit_code}"
         return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg)] + analysis_children,successor_component_number=next_check_number)
 
-class BatchType:
-    """Elementair batchtype.
-
-    Laat niets expliciet toe, maar checks die geen (eigen) side effect hebben, worden niet vermeld in component_checks.
-    """
-
-    description = "batchtype dat enkel checks zonder side effects aanvaardt"
-    # moet enkel checks met potentiële side effects kennen
-    allowed_checks = []
-
-    @classmethod
-    def can_cleanup(cls,exercises):
-        # TODO: moet ook gebruikt worden
-        return False
-
-    @classmethod
-    def cleanup(cls,student_dir,model_dir):
-        pass
-
 class Strategy:
 
     def __init__(self,refusing_check=Negation(TrueCheck()),accepting_check=Negation(TrueCheck())):
@@ -254,6 +235,3 @@ class Strategy:
             logger.exception('Fout bij controle submissie: %s',e)
         logger.warning(f'Submissie die niet beslist kon worden. Outcome refusing was {outcome_refusing} en outcome accepting was {outcome_accepting}')
         return (SubmissionState.PENDING,[OutcomeComponent(component_number=None,outcome=None,desired_outcome=None,renderer="text",renderer_data=f"Het systeem kan niet automatisch bepalen of je inzending klopt. De lector wordt verwittigd. Weigering was {outcome_analysis_refusing.outcome} en aanvaarding was {outcome_analysis_accepting.outcome}")] + outcome_analysis_refusing.components + outcome_analysis_accepting.components)
-
-# order is important for selection dropdowns
-batch_types = [BatchType] + list(BatchType.__subclasses__())
