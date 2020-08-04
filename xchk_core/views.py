@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -26,6 +26,9 @@ def submission_view(request,submission_pk):
 
 @login_required
 def new_course_view(request,course_title):
+    repo = Repo.objects.filter(user=request.user).filter(course=course_title)
+    if not repo:
+        return HttpResponseForbidden("Je kan een cursus alleen bekijken als je er een repository voor hebt.")
     course = courses.courses()[course_title]
     graph = courses.course_graphs()[course_title]
     for v in graph.vs:
@@ -40,7 +43,7 @@ def new_course_view(request,course_title):
         print(dotfile)
         outpath = gv.render('dot','svg',f'/tmp/{course_title}.gv')
         with open(outpath) as fh2:
-            return render(request,'checkerapp/course_overview2.html',{'graph':fh2.read()})
+            return render(request,'xchk_core/course_overview.html',{'graph':fh2.read(),'repo_id'=repo.id})
 
 @login_required
 def check_scripts_view(request):
@@ -82,7 +85,7 @@ def course_feedback_view(request,course_pk):
 class CreateRepoView(LoginRequiredMixin,CreateView):
     model = Repo
     fields = ['course','url']
-    success_url = reverse_lazy('checkerapp:index')
+    success_url = reverse_lazy('index')
 
     # TODO: controleren dat cursus voorkomt als titel in courses.py
     def get_form(self, *args, **kwargs):
@@ -93,3 +96,13 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super(CreateRepoView,self).form_valid(form)
+
+class DeleteRepoView(LoginRequiredMixin,DeleteView):
+    model = Repo
+    success_url = reverse_lazy('index')
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.user != self.request.user:
+            return HttpResponseForbidden("Je mag geen repository verwijderen die aan iemand anders toebehoort.")
+        return super(DeleteView,self).dispatch(request, *args, **kwargs)

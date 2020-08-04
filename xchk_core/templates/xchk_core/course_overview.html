@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% autoescape off %}
+    {{ graph }}
+{% endautoescape %}
+
+<a href="{% url 'delete_repo_view' repo_id %}">Mijn repository voor deze cursus verwijderen.</a>
+ 
+{% endblock %}

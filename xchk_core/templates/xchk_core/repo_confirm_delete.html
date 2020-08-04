@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<form method="POST">
+{% csrf_token %}
+<p>Ben je zeker dat je {{ object }} wil verwijderen?</p>
+<input type="submit">
+</form>
+{% endblock %}
