@@ -5,7 +5,7 @@ from . import views, contentviews
 
 app_name = 'checkerapp'
 urlpatterns = [
-    path('', views.check_scripts_view, name='index'),
+    path('', views.index_view, name='index'),
     path('create_repo', views.CreateRepoView.as_view(), name='create_repo'),
     path('content/impossible_node', contentviews.ImpossibleNodeView.as_view(), name=f'{contentviews.ImpossibleNodeView.uid}_view'),
     path('nodes/feedback/<int:node_pk>', views.node_feedback_view, name='node_feedback_view'),

@@ -17,6 +17,9 @@ from .models import Repo, SubmissionState
 from . import courses
 from django.forms import ChoiceField
 
+def index_view(request):
+    return render(request,'xchk_core/index.html')
+
 @login_required
 def submission_view(request,submission_pk):
     if request.user.is_superuser:
@@ -44,17 +47,6 @@ def new_course_view(request,course_title):
         outpath = gv.render('dot','svg',f'/tmp/{course_title}.gv')
         with open(outpath) as fh2:
             return render(request,'xchk_core/course_overview.html',{'graph':fh2.read(),'repo_id':repo.id})
-
-@login_required
-def check_scripts_view(request):
-    repos = Repo.objects.filter(user=request.user)
-    nodes = Node.objects.all()
-    if repos:
-        repoform = RepoSelectionForm(owner=request.user)
-        formset = CheckRequestFormSet(form_kwargs={'exercises': nodes, 'user': request.user})
-        return render(request, 'checkerapp/index.html', {'repoform': repoform, 'formset': formset})
-    else:
-        return redirect('checkerapp:create_repo')
 
 def node_feedback_view(request,node_pk):
     form = FeedbackForm(request.POST)
@@ -103,6 +95,6 @@ class DeleteRepoView(LoginRequiredMixin,DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
-        if obj.user != self.request.user:
+        if obj.user != self.request.user and !self.request.user.is_superuser:
             return HttpResponseForbidden("Je mag geen repository verwijderen die aan iemand anders toebehoort.")
         return super(DeleteView,self).dispatch(request, *args, **kwargs)
