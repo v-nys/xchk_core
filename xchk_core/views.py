@@ -95,6 +95,6 @@ class DeleteRepoView(LoginRequiredMixin,DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
-        if obj.user != self.request.user and !self.request.user.is_superuser:
+        if obj.user != self.request.user and not self.request.user.is_superuser:
             return HttpResponseForbidden("Je mag geen repository verwijderen die aan iemand anders toebehoort.")
         return super(DeleteView,self).dispatch(request, *args, **kwargs)
