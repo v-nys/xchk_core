@@ -30,7 +30,7 @@ def submission_view(request,submission_pk):
 @login_required
 def new_course_view(request,course_title):
     repo = Repo.objects.filter(user=request.user).filter(course=course_title)
-    if not repo:
+    if not repo and not request.user.is_superuser:
         return HttpResponseForbidden("Je kan een cursus alleen bekijken als je er een repository voor hebt.")
     course = courses.courses()[course_title]
     graph = courses.course_graphs()[course_title]
