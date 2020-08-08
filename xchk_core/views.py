@@ -46,7 +46,10 @@ def new_course_view(request,course_title):
         print(dotfile)
         outpath = gv.render('dot','svg',f'/tmp/{course_title}.gv')
         with open(outpath) as fh2:
-            return render(request,'xchk_core/course_overview.html',{'graph':fh2.read(),'repo_id':repo.id})
+            data = {'graph':fh2.read()}
+            if repo:
+                data['repo_id'] = repo.id
+            return render(request,'xchk_core/course_overview.html',data)
 
 def node_feedback_view(request,node_pk):
     form = FeedbackForm(request.POST)
