@@ -23,9 +23,7 @@ def courses():
 # TODO: memoize?
 def course_graphs():
     graphs = {}
-    print('begin cursussen')
     for course in courses():
-        print(f'cursus is {course}')
         graph = igraph.Graph(directed=True)
         graphs[course] = graph
         node_set = set()
@@ -38,6 +36,7 @@ def course_graphs():
         for (idx,content) in enumerate(node_lst):
             graph.vs[idx]["contentview"] = content
             graph.vs[idx]["label"] = content.uid
+            graph.vs[idx]["id"] = content.uid
         # edges toevoegen... lastig, want info is er niet meer
         # zal gewoon nog eens moeten traversen
         for (dependent,dependencies) in courses()[course].structure:
