@@ -49,7 +49,7 @@ def new_course_view(request,course_title):
             # igraph always numbers vertices
             # so we have to get dependencies from graph, not course
             dependencies = {v.index : graph.es.select(_target=v.index) for v in graph.vs}
-            data = {'graph':fh2.read(), 'supplied_dependencies': {'8' : ['0'], '0' : ['5']}}
+            data = {'graph':fh2.read(), 'supplied_dependencies': dependencies}
             if repo:
                 data['repo_id'] = repo.id
             return render(request,'xchk_core/course_overview.html',data)
