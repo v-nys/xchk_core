@@ -11,3 +11,29 @@
 {% endif %}
  
 {% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script>
+dependencies = {{ json_dependencies }};
+markWithDependencies = function(title) {
+  var node = $(".node").filter(function() { return $(this).find('title').text() === title });
+  node.addClass("dependency");
+  var node_dependencies = dependencies[title];
+  if (node_dependencies) {
+    for (dep in node_dependencies) {
+      markWithDependencies(node_dependencies[dep]);
+    }
+  }
+}
+$(window).on('load', function() {
+  $(".node").hover(
+    function(e) {
+      markWithDependencies($(this).find('title').html());
+    },
+    function(e) {
+      $("*").removeClass("dependency")
+  });
+}); 
+</script>
+{% endblock %}

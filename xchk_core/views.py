@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib import messages
 import datetime
 import re
+import json
 import requests
 import itertools
 import graphviz as gv
@@ -46,7 +47,7 @@ def new_course_view(request,course_title):
         print(dotfile)
         outpath = gv.render('dot','svg',f'/tmp/{course_title}.gv')
         with open(outpath) as fh2:
-            data = {'graph':fh2.read()}
+            data = {'graph':fh2.read(), 'json_dependencies': json.dumps({'8' : ['0'], '0' : ['5']})}
             if repo:
                 data['repo_id'] = repo.id
             return render(request,'xchk_core/course_overview.html',data)
