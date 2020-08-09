@@ -48,7 +48,7 @@ def new_course_view(request,course_title):
         with open(outpath) as fh2:
             # igraph always numbers vertices
             # so we have to get dependencies from graph, not course
-            dependencies = {str(v.index) : [] for v in graph.vs}
+            dependencies = {str(v.index) : [e for e in graph.es.select(_target=v)] for v in graph.vs}
             data = {'graph':fh2.read(), 'supplied_dependencies': dependencies}
             if repo:
                 data['repo_id'] = repo.id
