@@ -36,8 +36,6 @@ def course_graphs():
         for (idx,content) in enumerate(node_lst):
             graph.vs[idx]["contentview"] = content
             graph.vs[idx]["label"] = content.uid
-            graph.vs[idx]["id"] = content.uid
-            graph.vs[idx]["title"] = content.uid
         # edges toevoegen... lastig, want info is er niet meer
         # zal gewoon nog eens moeten traversen
         for (dependent,dependencies) in courses()[course].structure:

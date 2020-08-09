@@ -46,7 +46,9 @@ def new_course_view(request,course_title):
         print(dotfile)
         outpath = gv.render('dot','svg',f'/tmp/{course_title}.gv')
         with open(outpath) as fh2:
-            # TODO: echte titels gebruiken, hoe?
+            # igraph always numbers vertices
+            # so we have to get dependencies from graph, not course
+            dependencies = {v.index : graph.es.select(_target=v.index) for v in graph.vs}
             data = {'graph':fh2.read(), 'supplied_dependencies': {'8' : ['0'], '0' : ['5']}}
             if repo:
                 data['repo_id'] = repo.id
