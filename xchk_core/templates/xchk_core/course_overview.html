@@ -14,8 +14,9 @@
 
 {% block javascript %}
 {{ block.super }}
+{{ supplied_dependencies|json_script:"supplied_dependencies" }}
 <script>
-dependencies = {{ json_dependencies }};
+dependencies = JSON.parse(document.getElementById('supplied_dependencies').textContent);
 markWithDependencies = function(title) {
   var node = $(".node").filter(function() { return $(this).find('title').text() === title });
   node.addClass("dependency");
