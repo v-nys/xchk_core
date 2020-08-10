@@ -43,7 +43,7 @@ class ContentView(View,LoginRequiredMixin):
         if self.__class__.is_accessible_by(user):
             instructions = self.strat.instructions(self.uid)
             print(instructions)
-            return render(request,self.template,{'uid':self.uid,'repoform':repoform,'instructions':instructions,'custom_data':self.custom_data})
+            return render(request,self.template,{'pagetitle': self.title, 'uid':self.uid,'repoform':repoform,'instructions':instructions,'custom_data':self.custom_data})
         else:
             return HttpResponseServerError()
 
