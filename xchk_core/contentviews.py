@@ -18,6 +18,7 @@ class ContentView(View,LoginRequiredMixin):
     strat = strats.Strategy()
     template = 'maaktnietuit.html'
     custom_data = {}
+    title = 'aanvullen'
 
     @classmethod
     def is_accessible_by(cls,user):
