@@ -1,4 +1,5 @@
 import functools
+import inspect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.views import View
@@ -52,6 +53,9 @@ class ImpossibleNodeView(ContentView):
     uid = 'impossible_node'
     strat = strats.Strategy(refusing_check=strats.TrueCheck())
     template = 'checkerapp/impossible_node.html'
+
+def is_content_view(e):
+    return inspect.isclass(e) and issubclass(e,ContentView)
 
 # generator for laziness
 all_contentviews = (cv for cv in set(ContentView.__subclasses__()))
