@@ -82,7 +82,7 @@ def course_feedback_view(request,course_pk):
 class CreateRepoView(LoginRequiredMixin,CreateView):
     model = Repo
     fields = ['course','url']
-    success_url = reverse_lazy('checkerapp.index')
+    success_url = reverse_lazy('checkerapp:index')
 
     # TODO: controleren dat cursus voorkomt als titel in courses.py
     def get_form(self, *args, **kwargs):
