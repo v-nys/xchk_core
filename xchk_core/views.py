@@ -33,7 +33,7 @@ def new_course_view(request,course_title):
     repo = None
     try:
         repo = Repo.objects.filter(user=request.user).get(course=course_title)
-    except ObjectDoesNotExist e:
+    except ObjectDoesNotExist as e:
         if not request.user.is_superuser:
             raise e
     course = courses.courses()[course_title]
