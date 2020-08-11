@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.detail import DetailView
@@ -29,9 +30,12 @@ def submission_view(request,submission_pk):
 
 @login_required
 def new_course_view(request,course_title):
-    repo = Repo.objects.filter(user=request.user).filter(course=course_title)
-    if not repo and not request.user.is_superuser:
-        return HttpResponseForbidden("Je kan een cursus alleen bekijken als je er een repository voor hebt.")
+    repo = None
+    try:
+        repo = Repo.objects.filter(user=request.user).get(course=course_title)
+    except ObjectDoesNotExist e:
+        if not request.user.is_superuser:
+            raise e
     course = courses.courses()[course_title]
     graph = courses.course_graphs()[course_title]
     for v in graph.vs:
@@ -85,6 +89,7 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
     success_url = reverse_lazy('checkerapp:index')
 
     # TODO: controleren dat cursus voorkomt als titel in courses.py
+    # TODO: controleren dat user nog geen repo heeft voor deze cursus?
     def get_form(self, *args, **kwargs):
         form = super(CreateRepoView, self).get_form(*args,**kwargs)
         form.fields['course'] = ChoiceField(choices=[(key,key) for key in courses.courses().keys()])
