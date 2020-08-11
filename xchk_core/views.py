@@ -101,7 +101,7 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
 
 class DeleteRepoView(LoginRequiredMixin,DeleteView):
     model = Repo
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('checkerapp:index')
 
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
