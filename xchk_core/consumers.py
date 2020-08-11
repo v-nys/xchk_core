@@ -51,7 +51,6 @@ class CheckRequestConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         # TODO: can simplify now that exercises are checked one by one
-        print(text_data)
         text_data_json = json.loads(text_data)
         # TODO: giving task five minutes, may be able to come up with something more intelligent
         repo = Repo.objects.get(pk=int(text_data_json['repo']))
@@ -81,5 +80,4 @@ class CheckRequestConsumer(WebsocketConsumer):
                                            expires=300)
 
     def completion(self, event):
-        print(event)
         self.send(text_data=json.dumps({'last_reached_file': event['last_reached_file'], 'analysis': event['analysis']}))

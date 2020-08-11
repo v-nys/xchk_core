@@ -43,7 +43,6 @@ def new_course_view(request,course_title):
     graph.write_dot(f'/tmp/{course_title}.gv')
     with open(f'/tmp/{course_title}.gv') as fh:
         dotfile = fh.read()
-        print(dotfile)
         outpath = gv.render('dot','svg',f'/tmp/{course_title}.gv')
         with open(outpath) as fh2:
             # igraph always numbers vertices

@@ -65,9 +65,6 @@ def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
     subprocess.run(f'rm -rf {MODEL_SOLUTION_DIR}',shell=True)
     subprocess.run(f'rm -rf {STUDENT_SOLUTION_DIR}',shell=True)
     cmd = f'git clone {courses.courses[repo.course].solutions_url} {MODEL_SOLUTION_DIR}'
-    print(courses.courses[repo.course].description)
-    print(courses.courses[repo.course].solutions_url)
-    print(cmd)
     subprocess.run(cmd,shell=True)
     subprocess.run(f'git clone {repo.url} {STUDENT_SOLUTION_DIR}',shell=True)
     subprocess.run(f'chmod -R 777 {STUDENT_SOLUTION_DIR}',shell=True)
@@ -75,7 +72,6 @@ def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
                               shell=True,\
                               capture_output=True).stdout.decode('utf-8').strip()
     submissions = [SubmissionV2.objects.get(id=submission_id) for submission_id in submission_ids]
-    print('gaan over naar subtaak')
     if len(checksum) == 40:
         return _check_submissions_in_commit(submissions,checksum)
     else:
@@ -105,7 +101,6 @@ def retrieve_submitted_files(submission_id,*args,**kwargs):
                 result.append((mentioned_file,'',False)) # dus file is er gewoon niet
         return result
     except Exception as e:
-        print(e)
         return "Iets misgelopen bij het ophalen van de verplichte bestanden. Kan een verkeerde filename zijn, kan een fout bij uitlezen files zijn."
 
 # top priority for notification task
