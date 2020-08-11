@@ -64,7 +64,7 @@ def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
     repo = Repo.objects.get(id=repo_id)
     subprocess.run(f'rm -rf {MODEL_SOLUTION_DIR}',shell=True)
     subprocess.run(f'rm -rf {STUDENT_SOLUTION_DIR}',shell=True)
-    cmd = f'git clone {courses.courses[repo.course].solutions_url} {MODEL_SOLUTION_DIR}'
+    cmd = f'git clone {courses.courses()[repo.course].solutions_url} {MODEL_SOLUTION_DIR}'
     subprocess.run(cmd,shell=True)
     subprocess.run(f'git clone {repo.url} {STUDENT_SOLUTION_DIR}',shell=True)
     subprocess.run(f'chmod -R 777 {STUDENT_SOLUTION_DIR}',shell=True)
