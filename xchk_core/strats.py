@@ -26,6 +26,8 @@ class CheckingPredicate:
     def component_checks(self):
         return []
 
+    # TODO: deprecate?
+    # component FileExistsChecks tell us this, so component_checks would be enough...
     def mentioned_files(self,exercise_name):
         """This is here so we can easily check submitted relevant files through UI."""
         return set()
@@ -38,6 +40,10 @@ class CheckingPredicate:
         return same_types and same_vars
 
     def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
+        """Returns an `OutcomeAnalysis` representing the global analysis of a submission.
+
+        The `OutcomeAnalysis` represents outcome of a check, assuming the current check is top-level.
+        It always has at least one component, which may contain more nested components."""
         components = [OutcomeComponent(component_number=init_check_number,
                                        outcome=True,
                                        desired_outcome=desired_outcome,
@@ -73,7 +79,9 @@ class Negation(CheckingPredicate):
         # invert the desired outcome, but also invert the explanation in case of mismatch
         # for loose coupling, just tell child that parent is a negation
         child_analysis = self.negated_predicate.check_submission(submission,student_path,model_path,not desired_outcome,init_check_number,parent_is_negation=True)
-        return OutcomeAnalysis(outcome=not child_analysis.outcome,outcomes_components=child_analysis.outcomes_components,successor_component_number=child_analysis.successor_component_number)
+        return OutcomeAnalysis(outcome=not child_analysis.outcome,
+                               outcomes_components=child_analysis.outcomes_components, # there is no separate component for this check
+                               successor_component_number=child_analysis.successor_component_number) # negation is absorbed into instruction
 
 class ConjunctiveCheck(CheckingPredicate):
 
@@ -193,6 +201,11 @@ class DisjunctiveCheck(CheckingPredicate):
             else:
                 # still need to do this due to short circuiting and numbering, but don't run check
                 # could add non-SC variant later on...
+                # TODO: hier verder zoeken
+                # normaal bevat een OutcomeAnalysis de successor_component_number
+                # wat is daar het effect van op heel dit?
+                # ook: wat met conjunctieve checks?
+                # vermoedelijk mag de else tak gewoon weg, maar moet nog in kaart brengen...
                 (_,next_check_number) = disjunct.instructions(submission.content_uid,next_check_number)
         error_msg = None
         if exit_code != desired_outcome:
