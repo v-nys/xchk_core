@@ -55,5 +55,6 @@ class ImpossibleNodeView(ContentView):
 def is_content_view(e):
     return inspect.isclass(e) and issubclass(e,ContentView)
 
-# generator for laziness
-all_contentviews = (cv for cv in set(ContentView.__subclasses__()))
+def all_contentviews():
+    for cv in set(ContentView.__subclasses__()):
+        yield cv

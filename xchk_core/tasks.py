@@ -32,7 +32,7 @@ def _check_submissions_in_commit(submissions,checksum):
         # kan zijn dat foute UID is ingegeven (weliswaar alleen door geknoei van studenten of update server)
         # is_accessible_by kan niet meer per node voorzien worden
         # maar kan wel per contentview voorzien worden
-        eligible_exercises = [content for content in contentviews.all_contentviews if content.uid == submission.content_uid]
+        eligible_exercises = [content for content in contentviews.all_contentviews() if content.uid == submission.content_uid]
         exercise = eligible_exercises[0]
         try:
             submission.checksum = checksum
