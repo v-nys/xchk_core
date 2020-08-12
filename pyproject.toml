@@ -12,6 +12,7 @@ django-enumfield = "^2.0.1"
 python-igraph = "^0.8.2"
 pinax-notifications = "^6.0.0"
 graphviz = "^0.14.1"
+iteration-utilities = "^0.10.1"
 
 [tool.poetry.dev-dependencies]
 beautifulsoup4 = "^4.9.1"
