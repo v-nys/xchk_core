@@ -20,7 +20,7 @@ class CheckingPredicate:
     @property
     def number_of_instructions(self):
         """Get the number of instructions in a checking predicate."""
-        return len(deepflatten(self.instructions("bla")))
+        return len(list(deepflatten(self.instructions("bla"))))
 
     def instructions(self,exercise_name):
         """Returns a hierarchical representation of the explicit conditions to be met for this check to return `True`.
