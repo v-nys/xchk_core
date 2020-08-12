@@ -22,12 +22,12 @@ def _node_instructions_2_ul(instructions):
         return (acc_txt + elem_txt,after_ctr)
     def _aux(lst_or_str,li_counter):
         if isinstance(lst_or_str,str):
-            return (f'<li><span id="#instruction-{li_counter}">{lst_or_str}</span></li>',li_counter+1)
+            return (f'<li><span id="instruction-{li_counter}">{lst_or_str}</span></li>',li_counter+1)
         elif len(lst_or_str) == 1:
             return _aux(lst_or_str[0],li_counter)
         else:
             (rec_txt,rec_ctr) = functools.reduce(_folded,lst_or_str[1:],("",li_counter+1))
-            return (f'<li><span id="#instruction-{li_counter}">{lst_or_str[0]}</span><ul>{rec_txt}</ul></li>',rec_ctr)
+            return (f'<li><span id="instruction-{li_counter}">{lst_or_str[0]}</span><ul>{rec_txt}</ul></li>',rec_ctr)
     (ref_elems,ctr) = _aux(instructions.refusing,1)
     (acc_elems,ctr) = _aux(instructions.accepting,ctr)
     return f'''<ul>
