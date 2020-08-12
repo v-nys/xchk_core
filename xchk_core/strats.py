@@ -20,7 +20,7 @@ class CheckingPredicate:
     @property
     def number_of_instructions(self):
         """Get the number of instructions in a checking predicate."""
-        return len(list(deepflatten(self.instructions("bla"))))
+        return len(list(deepflatten(self.instructions("bla"),ignore=str)))
 
     def instructions(self,exercise_name):
         """Returns a hierarchical representation of the explicit conditions to be met for this check to return `True`.
@@ -208,12 +208,14 @@ class DisjunctiveCheck(CheckingPredicate):
     def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
         exit_code = False # assume
         next_check_number = init_check_number + 1
+        print(f'initieel next check number: {next_check_number}')
         analysis_children = []
         for disjunct in self.disjuncts:
             if not exit_code:
                 # has successor_component_number field
                 outcome_analysis_child = disjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
                 next_check_number += disjunct.number_of_instructions
+                print(f'check number na disjunct: {next_check_number}')
                 analysis_children += outcome_analysis_child.outcomes_components
                 exit_code = exit_code or outcome_analysis_child.outcome
         error_msg = None
