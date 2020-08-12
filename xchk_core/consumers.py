@@ -56,7 +56,8 @@ class CheckRequestConsumer(WebsocketConsumer):
         print(text_data)
         repo = Repo.objects.get(pk=int(text_data_json['repo']))
         print(repo)
-        exercises = [contentview for contentview in contentviews.all_contentviews if contentview.uid in text_data_json['exercises']]
+        # FIXME: there should be exactly one exercise...
+        exercises = [contentview for contentview in contentviews.all_contentviews if contentview.uid == text_data_json['exercise']]
         print(exercises)
         recent_submissions = SubmissionV2.objects.filter(submitter=self.scope['user']).filter(timestamp__gte=datetime.datetime.now() - datetime.timedelta(seconds=15))
         if len(recent_submissions) > 0 and not self.scope['user'].is_superuser:
