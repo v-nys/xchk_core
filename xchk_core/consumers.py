@@ -58,7 +58,9 @@ class CheckRequestConsumer(WebsocketConsumer):
         print(repo)
         # FIXME: there should be exactly one exercise...
         all_contentviews = list(contentviews.all_contentviews)
+        all_contentviews2 = contentviews.ContentView.__subclasses__()
         print(all_contentviews)
+        print(all_contentviews2)
         exercises = [contentview for contentview in all_contentviews if contentview.uid == text_data_json['exercise']]
         print(exercises)
         recent_submissions = SubmissionV2.objects.filter(submitter=self.scope['user']).filter(timestamp__gte=datetime.datetime.now() - datetime.timedelta(seconds=15))
