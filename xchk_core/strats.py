@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 # TODO: consider merging into a single composite
 # outcome is present in OutcomeComponent anyway, so just make one Outcome tuple?
-OutcomeComponent = namedtuple('OutcomeComponent', ['component_number','outcome','desired_outcome','renderer','renderer_data'])
+# TODO: remove renderer and renderer_data (with an r) once rendered_data has been tested
+OutcomeComponent = namedtuple('OutcomeComponent', ['component_number','outcome','desired_outcome','renderer','renderer_data','rendered_data'])
 OutcomeAnalysis = namedtuple('OutcomeAnalysis', ['outcome','outcomes_components'])
 StratInstructions = namedtuple('StratInstructions', ['refusing','accepting'])
 
@@ -69,7 +70,8 @@ class CheckingPredicate:
                                        outcome=True,
                                        desired_outcome=desired_outcome,
                                        renderer="text" if not desired_outcome else None,
-                                       renderer_data="aan false kan nooit voldaan zijn" if not desired_outcome else None)]
+                                       renderer_data="aan false kan nooit voldaan zijn" if not desired_outcome else None,
+                                       rendered_data="")]
         return OutcomeAnalysis(outcome=True,
                                outcomes_components=components)
 
@@ -143,7 +145,7 @@ class ConjunctiveCheck(CheckingPredicate):
                 error_msg = f"AND moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"OR moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg)] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data="")] + analysis_children)
 
 class FileExistsCheck(CheckingPredicate):
 
@@ -177,7 +179,8 @@ class FileExistsCheck(CheckingPredicate):
                                        outcome=outcome,
                                        desired_outcome=desired_outcome,
                                        renderer=None if outcome == desired_outcome else "text",
-                                       renderer_data=extra_info)]
+                                       renderer_data=extra_info,
+                                       rendered_data="")]
         return OutcomeAnalysis(outcome=outcome,outcomes_components=components)
 
 class DisjunctiveCheck(CheckingPredicate):
@@ -224,7 +227,7 @@ class DisjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"AND moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg)] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data="")] + analysis_children)
 
 class Strategy:
 
@@ -259,4 +262,4 @@ class Strategy:
         except Exception as e:
             logger.exception('Fout bij controle submissie: %s',e)
         logger.warning(f'Submissie die niet beslist kon worden. Outcome refusing was {outcome_refusing} en outcome accepting was {outcome_accepting}')
-        return (SubmissionState.PENDING,[OutcomeComponent(component_number=None,outcome=None,desired_outcome=None,renderer="text",renderer_data=f"Het systeem kan niet automatisch bepalen of je inzending klopt. De lector wordt verwittigd. Weigering was {outcome_analysis_refusing.outcome} en aanvaarding was {outcome_analysis_accepting.outcome}")] + outcome_analysis_refusing.components + outcome_analysis_accepting.components)
+        return (SubmissionState.PENDING,[OutcomeComponent(component_number=None,outcome=None,desired_outcome=None,renderer="text",renderer_data=f"Het systeem kan niet automatisch bepalen of je inzending klopt. De lector wordt verwittigd. Weigering was {outcome_analysis_refusing.outcome} en aanvaarding was {outcome_analysis_accepting.outcome}",rendered_data="")] + outcome_analysis_refusing.components + outcome_analysis_accepting.components)
