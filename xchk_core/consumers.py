@@ -53,12 +53,9 @@ class CheckRequestConsumer(WebsocketConsumer):
         # TODO: can simplify now that exercises are checked one by one
         text_data_json = json.loads(text_data)
         # TODO: giving task five minutes, may be able to come up with something more intelligent
-        print(text_data)
         repo = Repo.objects.get(pk=int(text_data_json['repo']))
-        print(repo)
         # FIXME: there should be exactly one exercise...
         exercises = [contentview for contentview in contentviews.all_contentviews() if contentview.uid == text_data_json['exercise']]
-        print(exercises)
         recent_submissions = SubmissionV2.objects.filter(submitter=self.scope['user']).filter(timestamp__gte=datetime.datetime.now() - datetime.timedelta(seconds=15))
         if len(recent_submissions) > 0 and not self.scope['user'].is_superuser:
             self.send(text_data=json.dumps({'last_reached_file': "geen bestand gecontroleerd", "analysis": [(None,None,None,"text","je mag maar één keer per vijftien seconden checken")]}))

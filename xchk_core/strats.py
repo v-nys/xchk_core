@@ -107,7 +107,7 @@ class ConjunctiveCheck(CheckingPredicate):
         for conjunct in self.conjuncts:
             if exit_code:
                 outcome_analysis_child = conjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
-                analysis_children += outcome_analysis_child.components
+                analysis_children += outcome_analysis_child.outcomes_components
                 exit_code = exit_code and outcome_analysis_child.outcome
             else:
                 # still need to do this due to short circuiting and numbering, but don't run check
@@ -188,7 +188,7 @@ class DisjunctiveCheck(CheckingPredicate):
         for disjunct in self.disjuncts:
             if not exit_code:
                 outcome_analysis_child = disjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
-                analysis_children += outcome_analysis_child.components
+                analysis_children += outcome_analysis_child.outcomes_components
                 exit_code = exit_code or outcome_analysis_child.outcome
             else:
                 # still need to do this due to short circuiting and numbering, but don't run check
@@ -200,7 +200,7 @@ class DisjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"AND moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg)] + analysis_children,successor_component_number=next_check_number)
+        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg)] + analysis_children,successor_component_number=next_check_number)
 
 class Strategy:
 
@@ -227,10 +227,10 @@ class Strategy:
         try:
             outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,model_path,desired_outcome=False,init_check_number=1)
             if outcome_analysis_refusing.outcome:
-                return (SubmissionState.NEW_REFUSED,outcome_analysis_refusing.components)
+                return (SubmissionState.NEW_REFUSED,outcome_analysis_refusing.outcomes_components)
             outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,model_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.successor_component_number)
             if outcome_accepting:
-                return (SubmissionState.ACCEPTED,outcome_analysis_accepting.components)
+                return (SubmissionState.ACCEPTED,outcome_analysis_accepting.outcomes_components)
         except Exception as e:
             logger.exception('Fout bij controle submissie: %s',e)
         logger.warning(f'Submissie die niet beslist kon worden. Outcome refusing was {outcome_refusing} en outcome accepting was {outcome_accepting}')
