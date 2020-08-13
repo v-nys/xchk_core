@@ -61,7 +61,7 @@ class CheckingPredicate:
         same_vars = vars(self) == vars(obj)
         return same_types and same_vars
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
+    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         """Returns an `OutcomeAnalysis` representing the global analysis of a submission.
 
         The `OutcomeAnalysis` represents outcome of a check, assuming the current check is top-level.
@@ -71,7 +71,7 @@ class CheckingPredicate:
                                        desired_outcome=desired_outcome,
                                        renderer="text" if not desired_outcome else None,
                                        renderer_data="aan false kan nooit voldaan zijn" if not desired_outcome else None,
-                                       rendered_data="<p>aan false kan nooit voldaan zijn</p>" if not desired_outcome else None)]
+                                       rendered_data="<p>Aan false kan nooit voldaan zijn.</p>" if not desired_outcome else None)]
         return OutcomeAnalysis(outcome=True,
                                outcomes_components=components)
 
@@ -96,11 +96,11 @@ class Negation(CheckingPredicate):
     def mentioned_files(self,exercise_name):
         return self.negated_predicate.mentioned_files(exercise_name)
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
+    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         # cannot simply copy child analysis, because instructions are simplified through De Morgan
         # invert the desired outcome, but also invert the explanation in case of mismatch
         # for loose coupling, just tell child that parent is a negation
-        child_analysis = self.negated_predicate.check_submission(submission,student_path,model_path,not desired_outcome,init_check_number,parent_is_negation=True)
+        child_analysis = self.negated_predicate.check_submission(submission,student_path,model_path,not desired_outcome,init_check_number,parent_is_negation=True,open=open)
         return OutcomeAnalysis(outcome=not child_analysis.outcome,
                                outcomes_components=child_analysis.outcomes_components)
 
@@ -129,20 +129,20 @@ class ConjunctiveCheck(CheckingPredicate):
     def component_checks(self):
         return [c for conjunct in self.conjuncts for c in conjunct.component_checks()]
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
+    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         exit_code = True # assume
         next_check_number = init_check_number + 1
         analysis_children = []
         for conjunct in self.conjuncts:
             if exit_code:
-                outcome_analysis_child = conjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
+                outcome_analysis_child = conjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number,open=open)
                 next_check_number += conjunct.number_of_instructions
                 analysis_children += outcome_analysis_child.outcomes_components
                 exit_code = exit_code and outcome_analysis_child.outcome
         error_msg = None
         if exit_code != desired_outcome:
             if not parent_is_negation:
-                error_msg = f"AND moest {desired_outcome} leveren, leverde {exit_code}"
+                error_msg = f"Deze voorwaarde is een AND van alle instructies die er onder staan. AND moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"OR moest {not desired_outcome} leveren, leverde {not exit_code}"
         return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}</p>" if exit_code != desired_outcome else None)] + analysis_children)
@@ -165,7 +165,7 @@ class FileExistsCheck(CheckingPredicate):
     def negative_instructions(self,exercise_name):
         return [f'Je hebt geen bestand met naam {self.entry(exercise_name)}']
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
+    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         exercise_name = submission.content_uid
         entry = self.entry(exercise_name)
         outcome = os.path.exists(os.path.join(student_path,self.entry(exercise_name)))
@@ -208,7 +208,7 @@ class DisjunctiveCheck(CheckingPredicate):
     def component_checks(self):
         return [c for disjunct in self.disjuncts for c in disjunct.component_checks()]
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False):
+    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         exit_code = False # assume
         next_check_number = init_check_number + 1
         print(f'initieel next check number: {next_check_number}')
@@ -216,7 +216,7 @@ class DisjunctiveCheck(CheckingPredicate):
         for disjunct in self.disjuncts:
             if not exit_code:
                 # has successor_component_number field
-                outcome_analysis_child = disjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number)
+                outcome_analysis_child = disjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number,open=open)
                 next_check_number += disjunct.number_of_instructions
                 print(f'check number na disjunct: {next_check_number}')
                 analysis_children += outcome_analysis_child.outcomes_components
@@ -227,7 +227,7 @@ class DisjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"AND moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data="<table><tr><th>booyah</th><th>goed gedaan</th></tr><tr><td>100/100</td><td>wat met \"quotes\"?</td></tr></table>")] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"{error_msg}")] + analysis_children)
 
 class Strategy:
 
