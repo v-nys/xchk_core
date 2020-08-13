@@ -14,7 +14,6 @@ from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
-MODEL_SOLUTION_DIR = '/tmp/modeloplossingen'
 STUDENT_SOLUTION_DIR = '/tmp/studentrepo'
 
 ############################################
@@ -38,7 +37,7 @@ def _check_submissions_in_commit(submissions,checksum):
             submission.checksum = checksum
             if exit_code is None or exit_code == SubmissionState.ACCEPTED:
                 strategy = exercise.strat
-                (exit_code,analysis) = strategy.check_submission(submission,STUDENT_SOLUTION_DIR,MODEL_SOLUTION_DIR)
+                (exit_code,analysis) = strategy.check_submission(submission,STUDENT_SOLUTION_DIR)
                 submission.state = exit_code
                 if exit_code is not None and exit_code != SubmissionState.ACCEPTED:
                     first_failed_or_unreached_submission = submission
@@ -62,10 +61,7 @@ def _check_submissions_in_commit(submissions,checksum):
 def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
     # all id's have been queried by consumer, so assume they are okay
     repo = Repo.objects.get(id=repo_id)
-    subprocess.run(f'rm -rf {MODEL_SOLUTION_DIR}',shell=True)
     subprocess.run(f'rm -rf {STUDENT_SOLUTION_DIR}',shell=True)
-    cmd = f'git clone {courses.courses()[repo.course].solutions_url} {MODEL_SOLUTION_DIR}'
-    subprocess.run(cmd,shell=True)
     subprocess.run(f'git clone {repo.url} {STUDENT_SOLUTION_DIR}',shell=True)
     subprocess.run(f'chmod -R 777 {STUDENT_SOLUTION_DIR}',shell=True)
     checksum = subprocess.run(f'cd {STUDENT_SOLUTION_DIR} ; git rev-parse HEAD',\

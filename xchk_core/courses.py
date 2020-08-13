@@ -6,11 +6,10 @@ from django.conf import settings
 
 class Course:
 
-    def __init__(self,uid,desc,structure,solutions_url):
+    def __init__(self,uid,desc,structure):
         self.uid = uid
         self.description = desc
         self.structure = structure
-        self.solutions_url = solutions_url
 
 def courses():
     course_dict = {}

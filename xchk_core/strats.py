@@ -61,7 +61,7 @@ class CheckingPredicate:
         same_vars = vars(self) == vars(obj)
         return same_types and same_vars
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
+    def check_submission(self,submission,student_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         """Returns an `OutcomeAnalysis` representing the global analysis of a submission.
 
         The `OutcomeAnalysis` represents outcome of a check, assuming the current check is top-level.
@@ -96,11 +96,11 @@ class Negation(CheckingPredicate):
     def mentioned_files(self,exercise_name):
         return self.negated_predicate.mentioned_files(exercise_name)
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
+    def check_submission(self,submission,student_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         # cannot simply copy child analysis, because instructions are simplified through De Morgan
         # invert the desired outcome, but also invert the explanation in case of mismatch
         # for loose coupling, just tell child that parent is a negation
-        child_analysis = self.negated_predicate.check_submission(submission,student_path,model_path,not desired_outcome,init_check_number,parent_is_negation=True,open=open)
+        child_analysis = self.negated_predicate.check_submission(submission,student_path,not desired_outcome,init_check_number,parent_is_negation=True,open=open)
         return OutcomeAnalysis(outcome=not child_analysis.outcome,
                                outcomes_components=child_analysis.outcomes_components)
 
@@ -129,13 +129,13 @@ class ConjunctiveCheck(CheckingPredicate):
     def component_checks(self):
         return [c for conjunct in self.conjuncts for c in conjunct.component_checks()]
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
+    def check_submission(self,submission,student_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         exit_code = True # assume
         next_check_number = init_check_number + 1
         analysis_children = []
         for conjunct in self.conjuncts:
             if exit_code:
-                outcome_analysis_child = conjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number,open=open)
+                outcome_analysis_child = conjunct.check_submission(submission,student_path,desired_outcome,next_check_number,open=open)
                 next_check_number += conjunct.number_of_instructions
                 analysis_children += outcome_analysis_child.outcomes_components
                 exit_code = exit_code and outcome_analysis_child.outcome
@@ -165,7 +165,7 @@ class FileExistsCheck(CheckingPredicate):
     def negative_instructions(self,exercise_name):
         return [f'Je hebt geen bestand met naam {self.entry(exercise_name)}']
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
+    def check_submission(self,submission,student_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         exercise_name = submission.content_uid
         entry = self.entry(exercise_name)
         outcome = os.path.exists(os.path.join(student_path,self.entry(exercise_name)))
@@ -208,7 +208,7 @@ class DisjunctiveCheck(CheckingPredicate):
     def component_checks(self):
         return [c for disjunct in self.disjuncts for c in disjunct.component_checks()]
 
-    def check_submission(self,submission,student_path,model_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
+    def check_submission(self,submission,student_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
         exit_code = False # assume
         next_check_number = init_check_number + 1
         print(f'initieel next check number: {next_check_number}')
@@ -216,7 +216,7 @@ class DisjunctiveCheck(CheckingPredicate):
         for disjunct in self.disjuncts:
             if not exit_code:
                 # has successor_component_number field
-                outcome_analysis_child = disjunct.check_submission(submission,student_path,model_path,desired_outcome,next_check_number,open=open)
+                outcome_analysis_child = disjunct.check_submission(submission,student_path,desired_outcome,next_check_number,open=open)
                 next_check_number += disjunct.number_of_instructions
                 print(f'check number na disjunct: {next_check_number}')
                 analysis_children += outcome_analysis_child.outcomes_components
@@ -248,15 +248,15 @@ class Strategy:
                 refusing=ref_instructions,
                 accepting=acc_instructions)
  
-    def check_submission(self,submission,student_path,model_path):
+    def check_submission(self,submission,student_path):
         (outcome_refusing,analysis_refusing) = (None,[])
         (outcome_accepting,analysis_accepting) = (None,[])
         try:
-            outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,model_path,desired_outcome=False,init_check_number=1)
+            outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,desired_outcome=False,init_check_number=1)
             # FIXME: need number...
             if outcome_analysis_refusing.outcome:
                 return (SubmissionState.NEW_REFUSED,outcome_analysis_refusing.outcomes_components)
-            outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,model_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.successor_component_number)
+            outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.successor_component_number)
             if outcome_accepting:
                 return (SubmissionState.ACCEPTED,outcome_analysis_accepting.outcomes_components)
         except Exception as e:
