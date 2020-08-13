@@ -63,6 +63,21 @@ class StrategyInstructionGenerationTest(TestCase):
                 StratInstructions(refusing=[AT_LEAST_ONE_TEXT,["False"],["False"],["Je hebt geen bestand met naam myfile.txt"]],
                                   accepting=[ALL_OF_TEXT,["True"],["True"],["Je hebt een bestand met naam myfile.txt"]]))
 
+class CheckSubmissionTest(TestCase):
+
+    def test_check_disjunct_with_alternatives_test(self):
+        check = DisjunctiveCheck([Negation(TrueCheck()),Negation(TrueCheck()),TrueCheck()])
+        analysis = check.check_submission(SubmissionV2(),'/tmp/student',True,1,False)
+        # first two don't yield desired outcome but desired outcome can still be reached
+        self.assertFalse(NO_ALTERNATIVES_ADDENDUM in analysis.outcomes_components[1].rendered_data)
+        self.assertFalse(NO_ALTERNATIVES_ADDENDUM in analysis.outcomes_components[2].rendered_data)
+
+    def test_check_disjunct_without_alternatives_test(self):
+        check = DisjunctiveCheck([Negation(TrueCheck()),Negation(TrueCheck()),TrueCheck()])
+        analysis = check.check_submission(SubmissionV2(),'/tmp/student',False,1,False)
+        # third component irrevocably prevents desired outcome from being reached
+        self.assertTrue(NO_ALTERNATIVES_ADDENDUM in analysis.outcomes_components[3].rendered_data)
+
 class Instructions2HtmlTest(TestCase):
 
     def setUp(self):
@@ -74,12 +89,12 @@ class Instructions2HtmlTest(TestCase):
         intended = '''<ul>
                         <li>Je oefening wordt geweigerd als:
                           <ul>
-                            <li><a href="#explanation-1">False</a></li>
+                            <li><span id="instruction-1">False</span></li>
                           </ul>
                         </li>
                         <li>Je oefening wordt aanvaard als:
                           <ul>
-                            <li><a href="#explanation-2">True</a></li>
+                            <li><span id="instruction-2">True</span></li>
                           </ul>
                         </li>
                       </ul>'''
@@ -98,23 +113,23 @@ class Instructions2HtmlTest(TestCase):
   <li>Je oefening wordt geweigerd als:
     <ul>
       <li>
-        <a href="#explanation-1">{ALL_OF_TEXT}</a>
+        <span id="instruction-1">{ALL_OF_TEXT}</span>
         <ul>
           <li>
-            <a href="#explanation-2">True</a>
+            <span id="instruction-2">True</span>
           </li>
           <li>
-            <a href="#explanation-3">{AT_LEAST_ONE_TEXT}</a>
+            <span id="instruction-3">{AT_LEAST_ONE_TEXT}</span>
             <ul>
-              <li><a href="#explanation-4">False</a></li>
-              <li><a href="#explanation-5">True</a></li>
+              <li><span id="instruction-4">False</span></li>
+              <li><span id="instruction-5">True</span></li>
             </ul>
           </li>
         </ul>
       </li>
     </ul>
   </li>
-  <li>Je oefening wordt aanvaard als:<ul><li><a href="#explanation-6">True</a></li></ul></li>
+  <li>Je oefening wordt aanvaard als:<ul><li><span id="instruction-6">True</span></li></ul></li>
 </ul>'''
         soup2 = BeautifulSoup(intended,'html.parser')
         self.assertEqual(soup1.prettify(),soup2.prettify())

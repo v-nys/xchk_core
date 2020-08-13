@@ -67,13 +67,12 @@ class CheckingPredicate:
 
         The `OutcomeAnalysis` represents outcome of a check, assuming the current check is top-level.
         It always has at least one component, which may contain more nested components."""
-        remark_alternatives = ' In het licht van de andere instructies betekent dit dat deze oefening onmogelijk aanvaard kan worden. Het is (momenteel) niet de bedoeling dat je ze door het systeem kan laten aanvaarden.' if not desired_outcome and not ancestor_has_alternatives else ''
         components = [OutcomeComponent(component_number=init_check_number,
                                        outcome=True,
                                        desired_outcome=desired_outcome,
                                        renderer="text" if not desired_outcome else None,
                                        renderer_data="aan false kan nooit voldaan zijn" if not desired_outcome else None,
-                                       rendered_data=f"<p>Aan false kan nooit voldaan zijn.{NO_ALTERNATIVES_ADDENDUM if not desired_outcome and not ancestor_has_alternatives}</p>" if not desired_outcome else None)]
+                                       rendered_data=f"<p>Aan false kan nooit voldaan zijn.{NO_ALTERNATIVES_ADDENDUM if not desired_outcome and not ancestor_has_alternatives else ''}</p>" if not desired_outcome else None)]
         return OutcomeAnalysis(outcome=True,
                                outcomes_components=components)
 
@@ -151,7 +150,7 @@ class ConjunctiveCheck(CheckingPredicate):
                 error_msg = f"Deze voorwaarde is een AND van alle instructies die er onder staan. AND moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"OR moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}{NO_ALTERNATIVES_ADDENDUM if exit_code != desired_outcome and not ancestor_has_alternatives}</p>" if exit_code != desired_outcome else None)] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}{NO_ALTERNATIVES_ADDENDUM if exit_code != desired_outcome and not ancestor_has_alternatives else ''}</p>" if exit_code != desired_outcome else None)] + analysis_children)
 
 class FileExistsCheck(CheckingPredicate):
 
@@ -186,7 +185,7 @@ class FileExistsCheck(CheckingPredicate):
                                        desired_outcome=desired_outcome,
                                        renderer=None if outcome == desired_outcome else "text",
                                        renderer_data=extra_info,
-                                       rendered_data=f"{extra_info}{NO_ALTERNATIVES_ADDENDUM if outcome != desired_outcome and not ancestor_has_alternatives}" if outcome != desired_outcome else "")]
+                                       rendered_data=f"{extra_info}{NO_ALTERNATIVES_ADDENDUM if outcome != desired_outcome and not ancestor_has_alternatives else ''}" if outcome != desired_outcome else "")]
         return OutcomeAnalysis(outcome=outcome,outcomes_components=components)
 
 class DisjunctiveCheck(CheckingPredicate):
@@ -214,7 +213,7 @@ class DisjunctiveCheck(CheckingPredicate):
     def component_checks(self):
         return [c for disjunct in self.disjuncts for c in disjunct.component_checks()]
 
-    def check_submission(self,submission,student_path,desired_outcome,init_check_number,parent_is_negation=False,open=open):
+    def check_submission(self,submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation=False,open=open):
         exit_code = False # assume
         next_check_number = init_check_number + 1
         analysis_children = []
@@ -234,7 +233,7 @@ class DisjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"AND moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}{NO_ALTERNATIVES_ADDENDUM if exit_code != desired_outcome and not ancestor_has_alternatives}</p>")] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}{NO_ALTERNATIVES_ADDENDUM if exit_code != desired_outcome and not ancestor_has_alternatives else ''}</p>")] + analysis_children)
 
 class Strategy:
 
@@ -259,10 +258,10 @@ class Strategy:
         (outcome_refusing,analysis_refusing) = (None,[])
         (outcome_accepting,analysis_accepting) = (None,[])
         try:
-            outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,desired_outcome=False,init_check_number=1,False)
+            outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,desired_outcome=False,init_check_number=1,ancestor_has_alternatives=False)
             if outcome_analysis_refusing.outcome:
                 return (SubmissionState.NEW_REFUSED,outcome_analysis_refusing.outcomes_components)
-            outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.successor_component_number,False)
+            outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.successor_component_number,ancestor_has_alternatives=False)
             if outcome_accepting:
                 return (SubmissionState.ACCEPTED,outcome_analysis_accepting.outcomes_components)
         except Exception as e:
