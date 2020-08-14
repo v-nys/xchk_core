@@ -68,7 +68,7 @@ class CheckRequestConsumer(WebsocketConsumer):
                 submission = SubmissionV2(checksum=None,
                                           timestamp=datetime.datetime.now(),
                                           repo=repo,
-                                          state=SubmissionState.PENDING,
+                                          state=SubmissionState.QUEUED,
                                           submitter=self.scope['user'],
                                           # eigenlijk een class attribute maar kan er ook zo aan
                                           content_uid=exercise.uid)
@@ -89,8 +89,8 @@ class CheckRequestConsumer(WebsocketConsumer):
             message = "Je oefening is geweigerd. Inspecteer de gemarkeerde technische vereisten. Contacteer zo nodig de lector nadat je dit hebt gedaan."
         elif state == SubmissionState.NOT_REACHED:
             message = "Er is een technische fout opgetreden tijdens het verwerken van je oefening. Dit kan aan jouw oplossing liggen, maar het kan ook een storing zijn. Klik op de rode knop onderaan en stuur de getoonde informatie naar de lector."
-        elif state == SubmissionState.PENDING:
+        elif state == SubmissionState.UNDECIDED:
             message = "Je oefening is voorlopig aanvaard. Het systeem heeft ze nog niet leren herkennen als juist of fout. Je mag voorlopig verder en de lector zal je oefening met de hand nakijken."
         else:
             message = "Onbekende toestand. Klik op de rode knop onderaan en stuur de getoonde informatie naar de lector."
-        self.send(text_data=json.dumps({'message': message, 'show_contact_button': state not in [SubmissionState.ACCEPTED, SubmissionState.PENDING], 'components': event['components']}))
+        self.send(text_data=json.dumps({'message': message, 'show_contact_button': state not in [SubmissionState.ACCEPTED, SubmissionState.UNDECIDED], 'components': event['components']}))

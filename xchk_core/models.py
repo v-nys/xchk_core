@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 
 class SubmissionState(enum.Enum):
     ACCEPTED = 0
-    REFUSED = -1
-    PENDING = 1
-    NOT_REACHED = 2
-    NEW_REFUSED = 3
+    REFUSED = 1
+    NOT_REACHED = 2 # can occur in case of technical error
+    QUEUED = 3
+    UNDECIDED = 4
 
 class FeedbackType(enum.Enum):
     LIKE = 0
@@ -52,7 +52,7 @@ class SubmissionV2(models.Model):
     checksum = models.CharField(max_length=40,null=True)
     timestamp = models.DateTimeField()
     repo = models.ForeignKey(Repo, null=False, on_delete=models.CASCADE)
-    state = enum.EnumField(SubmissionState, default=SubmissionState.PENDING)
+    state = enum.EnumField(SubmissionState, default=SubmissionState.QUEUED)
     submitter = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     feedback = models.TextField(null=True,blank=True)
     content_uid = models.CharField(max_length=40,null=False)
