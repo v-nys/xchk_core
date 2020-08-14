@@ -43,7 +43,9 @@ def new_course_view(request,course_title):
         if uid != 'impossible_node':
             if v["contentview"].is_accessible_by(request.user):
                 v["URL"] = reverse(f'{v["contentview"].uid}_view')
-            else:
+                v["color"] = "black";
+                v["fontcolor"] = "black";
+             else:
                 v["color"] = "gray";
                 v["fontcolor"] = "gray";
         else:
