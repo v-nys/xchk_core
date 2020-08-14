@@ -8,7 +8,6 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponseServerError
 from .forms import RepoSelectionForm
 from . import strats, courses
-from . import courses
 from .models import SubmissionV2, SubmissionState
 from .strats import *
 
@@ -23,7 +22,7 @@ class ContentView(View,LoginRequiredMixin):
 
     @classmethod
     def is_accessible_by(cls,user):
-        return user.is_superuser or any(cls.is_accessible_by_in(user,course) for course in courses.courses)
+        return user.is_superuser or any(cls.is_accessible_by_in(user,course) for course in courses.courses())
 
     @classmethod
     def is_accessible_by_in(cls,user,course):
