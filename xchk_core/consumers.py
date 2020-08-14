@@ -93,4 +93,4 @@ class CheckRequestConsumer(WebsocketConsumer):
             message = "Je oefening is voorlopig aanvaard. Het systeem heeft ze nog niet leren herkennen als juist of fout. Je mag voorlopig verder en de lector zal je oefening met de hand nakijken."
         else:
             message = "Onbekende toestand. Klik op de rode knop onderaan en stuur de getoonde informatie naar de lector."
-        self.send(text_data=json.dumps({'message': message, 'show_contact_button': state not in [SubmissionState.ACCEPTED, SubmissionState.UNDECIDED], 'components': event['components']}))
+        self.send(text_data=json.dumps({'message': message, 'show_contact_button': state not in [SubmissionState.ACCEPTED, SubmissionState.UNDECIDED], 'components': event['components'], 'url': strategy_analysis.submission_url, 'checksum': strategy_analysis.submission_checksum}))
