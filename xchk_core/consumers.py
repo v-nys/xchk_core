@@ -81,7 +81,7 @@ class CheckRequestConsumer(WebsocketConsumer):
                                            expires=300)
 
     def completion(self, event):
-        strategy_analysis = strats.StrategyAnalysis(event['strategy_analysis'])
+        strategy_analysis = strats.StrategyAnalysis(*event['strategy_analysis'])
         state = strategy_analysis.submission_state
         if state == SubmissionState.ACCEPTED:
             message = "Je oefening is aanvaard."
