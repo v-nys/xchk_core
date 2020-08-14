@@ -45,9 +45,9 @@ def new_course_view(request,course_title):
                 v["URL"] = reverse(f'{v["contentview"].uid}_view')
                 v["color"] = "black";
                 v["fontcolor"] = "black";
-             else:
-                v["color"] = "gray";
-                v["fontcolor"] = "gray";
+            else:
+               v["color"] = "gray";
+               v["fontcolor"] = "gray";
         else:
             v["URL"] = reverse(f'checkerapp:{v["contentview"].uid}_view')
     graph.write_dot(f'/tmp/{course_title}.gv')
