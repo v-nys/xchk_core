@@ -41,7 +41,11 @@ def new_course_view(request,course_title):
     for v in graph.vs:
         uid = v["contentview"].uid
         if uid != 'impossible_node':
-            v["URL"] = reverse(f'{v["contentview"].uid}_view')
+            if v["contentview"].is_accessible_by(request.user):
+                v["URL"] = reverse(f'{v["contentview"].uid}_view')
+            else:
+                v["color"] = "gray";
+                v["fontcolor"] = "gray";
         else:
             v["URL"] = reverse(f'checkerapp:{v["contentview"].uid}_view')
     graph.write_dot(f'/tmp/{course_title}.gv')
