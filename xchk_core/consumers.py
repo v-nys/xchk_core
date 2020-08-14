@@ -81,4 +81,4 @@ class CheckRequestConsumer(WebsocketConsumer):
                                            expires=300)
 
     def completion(self, event):
-        self.send(text_data=json.dumps({'last_reached_file': event['last_reached_file'], 'analysis': event['analysis']}))
+        self.send(text_data=json.dumps({'strategy_analysis': event['strategy_analysis'], 'components': event['components']}))

@@ -82,13 +82,13 @@ def retrieve_submitted_files(submission_id,*args,**kwargs):
 # top priority for notification task
 # might as well notify users immediately...
 @celery_app.task(priority=9)
-def notify_result(last_file_and_analysis,group_name):
-    (last_file,analysis) = last_file_and_analysis
+def notify_result(strategy_analysis_and_components,group_name):
+    (strategy_analysis,components) = strategy_analysis_and_components
     channel_layer = channels.layers.get_channel_layer()
     async_to_sync(channel_layer.group_send)(group_name,
             {'type': 'completion',
-             'last_reached_file': last_file,
-             'analysis': analysis})
+             'strategy_analysis': strategy_analysis,
+             'components': components})
 
 @celery_app.task(priority=9)
 def notify_submitted_files(files,group_name):
