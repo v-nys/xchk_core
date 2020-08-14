@@ -29,7 +29,7 @@ class ContentView(View,LoginRequiredMixin):
         graph = courses.course_graphs()[course]
         v = graph.vs.find(label=cls.uid)
         preds = [e.source_vertex for e in graph.es.select(_to=v.index)]
-        return all((pred["contentview"].completed_by(user) for p in preds))
+        return all((p["contentview"].completed_by(user) for p in preds))
 
     @classmethod
     def completed_by(cls,user):
