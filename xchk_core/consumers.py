@@ -81,4 +81,16 @@ class CheckRequestConsumer(WebsocketConsumer):
                                            expires=300)
 
     def completion(self, event):
-        self.send(text_data=json.dumps({'strategy_analysis': event['strategy_analysis'], 'components': event['components']}))
+        strategy_analysis = strats.StrategyAnalysis(event['strategy_analysis'])
+        state = strategy_analysis.submission_state
+        if state == SubmissionState.ACCEPTED:
+            message = "Je oefening is aanvaard."
+        elif state == SubmissionState.NEW_REFUSED:
+            message = "Je oefening is geweigerd. Inspecteer de gemarkeerde technische vereisten. Contacteer zo nodig de lector nadat je dit hebt gedaan."
+        elif state == SubmissionState.NOT_REACHED:
+            message = "Er is een technische fout opgetreden tijdens het verwerken van je oefening. Dit kan aan jouw oplossing liggen, maar het kan ook een storing zijn. Klik op de rode knop onderaan en stuur de getoonde informatie naar de lector."
+        elif state == SubmissionState.PENDING:
+            message = "Je oefening is voorlopig aanvaard. Het systeem heeft ze nog niet leren herkennen als juist of fout. Je mag voorlopig verder en de lector zal je oefening met de hand nakijken."
+        else:
+            message = "Onbekende toestand. Klik op de rode knop onderaan en stuur de getoonde informatie naar de lector."
+        self.send(text_data=json.dumps({'message': message, 'show_contact_button': state not in [SubmissionState.ACCEPTED, SubmissionState.PENDING], 'components': event['components']}))
