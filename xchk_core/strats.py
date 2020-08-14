@@ -9,13 +9,12 @@ logger = logging.getLogger(__name__)
 # TODO: consider merging into a single composite
 # outcome is present in OutcomeComponent anyway, so just make one Outcome tuple?
 # TODO: remove renderer and renderer_data (with an r) once rendered_data has been tested
-OutcomeComponent = namedtuple('OutcomeComponent', ['component_number','outcome','desired_outcome','renderer','renderer_data','rendered_data'])
+OutcomeComponent = namedtuple('OutcomeComponent', ['component_number','outcome','desired_outcome','renderer','renderer_data','rendered_data','acceptable_to_ancestor'])
 OutcomeAnalysis = namedtuple('OutcomeAnalysis', ['outcome','outcomes_components'])
 StratInstructions = namedtuple('StratInstructions', ['refusing','accepting'])
 
 AT_LEAST_ONE_TEXT = "Aan minstens één van volgende voorwaarden is voldaan:"
 ALL_OF_TEXT = "Aan al volgende voorwaarden is voldaan:"
-NO_ALTERNATIVES_ADDENDUM = " Dit maakt het onmogelijk de oefening af te ronden."
 
 class CheckingPredicate:
 
@@ -72,7 +71,8 @@ class CheckingPredicate:
                                        desired_outcome=desired_outcome,
                                        renderer="text" if not desired_outcome else None,
                                        renderer_data="aan false kan nooit voldaan zijn" if not desired_outcome else None,
-                                       rendered_data=f"<p>Aan false kan nooit voldaan zijn.{NO_ALTERNATIVES_ADDENDUM if not desired_outcome and not ancestor_has_alternatives else ''}</p>" if not desired_outcome else None)]
+                                       rendered_data=f"<p>Aan false kan nooit voldaan zijn.</p>" if not desired_outcome else None,
+                                       acceptable_to_ancestor=desired_outcome or ancestor_has_alternatives)]
         return OutcomeAnalysis(outcome=True,
                                outcomes_components=components)
 
@@ -150,7 +150,7 @@ class ConjunctiveCheck(CheckingPredicate):
                 error_msg = f"Deze voorwaarde is een AND van alle instructies die er onder staan. AND moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"OR moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}{NO_ALTERNATIVES_ADDENDUM if exit_code != desired_outcome and not ancestor_has_alternatives else ''}</p>" if exit_code != desired_outcome else None)] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}</p>" if exit_code != desired_outcome else None,acceptable_to_ancestor=exit_code == desired_outcome or ancestor_has_alternatives)] + analysis_children)
 
 class FileExistsCheck(CheckingPredicate):
 
@@ -185,7 +185,8 @@ class FileExistsCheck(CheckingPredicate):
                                        desired_outcome=desired_outcome,
                                        renderer=None if outcome == desired_outcome else "text",
                                        renderer_data=extra_info,
-                                       rendered_data=f"{extra_info}{NO_ALTERNATIVES_ADDENDUM if outcome != desired_outcome and not ancestor_has_alternatives else ''}" if outcome != desired_outcome else "")]
+                                       rendered_data=f"{extra_info}" if outcome != desired_outcome else "",
+                                       acceptable_to_ancestor=outcome == desired_outcome or ancestor_has_alternatives)]
         return OutcomeAnalysis(outcome=outcome,outcomes_components=components)
 
 class DisjunctiveCheck(CheckingPredicate):
@@ -233,7 +234,7 @@ class DisjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"AND moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}{NO_ALTERNATIVES_ADDENDUM if exit_code != desired_outcome and not ancestor_has_alternatives else ''}</p>")] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,renderer="text" if exit_code != desired_outcome else None,renderer_data=error_msg,rendered_data=f"<p>{error_msg}</p>",acceptable_to_ancestor=exit_code == desired_outcome or ancestor_has_alternatives)] + analysis_children)
 
 class Strategy:
 

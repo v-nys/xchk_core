@@ -69,14 +69,14 @@ class CheckSubmissionTest(TestCase):
         check = DisjunctiveCheck([Negation(TrueCheck()),Negation(TrueCheck()),TrueCheck()])
         analysis = check.check_submission(SubmissionV2(),'/tmp/student',True,1,False)
         # first two don't yield desired outcome but desired outcome can still be reached
-        self.assertFalse(NO_ALTERNATIVES_ADDENDUM in analysis.outcomes_components[1].rendered_data)
-        self.assertFalse(NO_ALTERNATIVES_ADDENDUM in analysis.outcomes_components[2].rendered_data)
+        self.assertTrue(analysis.outcomes_components[1].acceptable_to_ancestor)
+        self.assertTrue(analysis.outcomes_components[2].acceptable_to_ancestor)
 
     def test_check_disjunct_without_alternatives_test(self):
         check = DisjunctiveCheck([Negation(TrueCheck()),Negation(TrueCheck()),TrueCheck()])
         analysis = check.check_submission(SubmissionV2(),'/tmp/student',False,1,False)
         # third component irrevocably prevents desired outcome from being reached
-        self.assertTrue(NO_ALTERNATIVES_ADDENDUM in analysis.outcomes_components[3].rendered_data)
+        self.assertFalse(analysis.outcomes_components[3].acceptable_to_ancestor)
 
 class Instructions2HtmlTest(TestCase):
 
