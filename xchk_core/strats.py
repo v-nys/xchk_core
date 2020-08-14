@@ -262,7 +262,7 @@ class Strategy:
         try:
             outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,desired_outcome=False,init_check_number=1,ancestor_has_alternatives=False)
             if outcome_analysis_refusing.outcome:
-                return (StrategyAnalysis(submission_state=SubmissionState.NEW_REFUSED,submission_url=submission.repo.url,submission_checksum=submission.checksum)),outcome_analysis_refusing.outcomes_components)
+                return (StrategyAnalysis(submission_state=SubmissionState.NEW_REFUSED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_refusing.outcomes_components)
             outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.successor_component_number,ancestor_has_alternatives=False)
             if outcome_accepting:
                 return (StrategyAnalysis(submission_State=SubmissionState.ACCEPTED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_accepting.outcomes_components)
