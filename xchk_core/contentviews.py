@@ -35,7 +35,7 @@ class ContentView(View,LoginRequiredMixin):
     @classmethod
     def completed_by(cls,user):
         submissions = SubmissionV2.objects.filter(content_uid=cls.uid).filter(submitter=user)
-        return any((submission.state == SubmissionState.ACCEPTED for submission in submissions))
+        return any((submission.state in [SubmissionState.ACCEPTED,SubmissionState.UNDECIDED] for submission in submissions))
 
     def get(self,request,*args,**kwargs):
         repoform = RepoSelectionForm(owner=request.user)
