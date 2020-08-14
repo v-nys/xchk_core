@@ -85,7 +85,7 @@ class CheckRequestConsumer(WebsocketConsumer):
         state = strategy_analysis.submission_state
         if state == SubmissionState.ACCEPTED:
             message = "Je oefening is aanvaard."
-        elif state == SubmissionState.NEW_REFUSED:
+        elif state == SubmissionState.REFUSED:
             message = "Je oefening is geweigerd. Inspecteer de gemarkeerde technische vereisten. Contacteer zo nodig de lector nadat je dit hebt gedaan."
         elif state == SubmissionState.NOT_REACHED:
             message = "Er is een technische fout opgetreden tijdens het verwerken van je oefening. Dit kan aan jouw oplossing liggen, maar het kan ook een storing zijn. Klik op de rode knop onderaan en stuur de getoonde informatie naar de lector."
