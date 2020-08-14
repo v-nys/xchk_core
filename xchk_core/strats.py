@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 # TODO: remove renderer and renderer_data (with an r) once rendered_data has been tested
 OutcomeComponent = namedtuple('OutcomeComponent', ['component_number','outcome','desired_outcome','renderer','renderer_data','rendered_data','acceptable_to_ancestor'])
 OutcomeAnalysis = namedtuple('OutcomeAnalysis', ['outcome','outcomes_components'])
+StrategyAnalysis = namedtuple('StrategyAnalysis', ['submission_state','submission_url','submission_checksum'])
 StratInstructions = namedtuple('StratInstructions', ['refusing','accepting'])
 
 AT_LEAST_ONE_TEXT = "Aan minstens één van volgende voorwaarden is voldaan:"
@@ -261,11 +262,12 @@ class Strategy:
         try:
             outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,desired_outcome=False,init_check_number=1,ancestor_has_alternatives=False)
             if outcome_analysis_refusing.outcome:
-                return (SubmissionState.NEW_REFUSED,outcome_analysis_refusing.outcomes_components)
+                return (StrategyAnalysis(submission_state=SubmissionState.NEW_REFUSED,submission_url=submission.repo.url,submission_checksum=submission.checksum)),outcome_analysis_refusing.outcomes_components)
             outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.successor_component_number,ancestor_has_alternatives=False)
             if outcome_accepting:
-                return (SubmissionState.ACCEPTED,outcome_analysis_accepting.outcomes_components)
+                return (StrategyAnalysis(submission_State=SubmissionState.ACCEPTED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_accepting.outcomes_components)
         except Exception as e:
             logger.exception('Fout bij controle submissie: %s',e)
-        logger.warning(f'Submissie die niet beslist kon worden. Outcome refusing was {outcome_refusing} en outcome accepting was {outcome_accepting}')
-        return (SubmissionState.PENDING,[OutcomeComponent(component_number=None,outcome=None,desired_outcome=None,renderer="text",renderer_data=f"Het systeem kan niet automatisch bepalen of je inzending klopt. De lector wordt verwittigd. Weigering was {outcome_analysis_refusing.outcome} en aanvaarding was {outcome_analysis_accepting.outcome}",rendered_data="")] + outcome_analysis_refusing.components + outcome_analysis_accepting.components)
+            logger.warning(f'Submissie die niet beslist kon worden. Outcome refusing was {outcome_refusing} en outcome accepting was {outcome_accepting}')
+            return (StrategyAnalysis(submission_state=SubmissionState.NOT_REACHED,submission_url=submission.repo.url,submission_checksum=submission.checksum),[])
+        return (StrategyAnalysis(submission_state=SubmissionState.PENDING,submission_url=submission.repo.url,submission_checksum=submission.checksum),[OutcomeComponent(component_number=None,outcome=None,desired_outcome=None,renderer="text",renderer_data=f"Het systeem kan niet automatisch bepalen of je inzending klopt. De lector wordt verwittigd. Weigering was {outcome_analysis_refusing.outcome} en aanvaarding was {outcome_analysis_accepting.outcome}",rendered_data="")] + outcome_analysis_refusing.components + outcome_analysis_accepting.components)

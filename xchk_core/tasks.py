@@ -3,6 +3,7 @@ import channels.layers
 from asgiref.sync import async_to_sync
 from .models import Repo, SubmissionState, SubmissionV2
 from . import contentviews, courses, strats
+from .strats import OutcomeAnalysis, OutcomeComponent
 
 import os
 import subprocess
@@ -23,39 +24,20 @@ STUDENT_SOLUTION_DIR = '/tmp/studentrepo'
 ############################################
 
 def _check_submissions_in_commit(submissions,checksum):
-    # TODO: can be simplified further now that batch types are gone
-    (exit_code, analysis) = (None,None)
-    first_failed_or_unreached_submission = None
+    (strategy_analysis, components_analysis) = (None,[])
     for submission in submissions:
         # FIXME: dit is snelle test
         # kan zijn dat foute UID is ingegeven (weliswaar alleen door geknoei van studenten of update server)
-        # is_accessible_by kan niet meer per node voorzien worden
-        # maar kan wel per contentview voorzien worden
-        eligible_exercises = [content for content in contentviews.all_contentviews() if content.uid == submission.content_uid]
+        # TODO: kan ik dit efficiënter maken door niet meteen de volledige lijst op te bouwen en enkel eerste elemen van lazy list te nemen? bespaart check accessibility...
+        eligible_exercises = [content for content in contentviews.all_contentviews() if content.uid == submission.content_uid and content.is_accessible_by(submission.submitter)]
         exercise = eligible_exercises[0]
-        try:
-            submission.checksum = checksum
-            if exit_code is None or exit_code == SubmissionState.ACCEPTED:
-                strategy = exercise.strat
-                (exit_code,analysis) = strategy.check_submission(submission,STUDENT_SOLUTION_DIR)
-                submission.state = exit_code
-                if exit_code is not None and exit_code != SubmissionState.ACCEPTED:
-                    first_failed_or_unreached_submission = submission
-            else:
-                submission.state = SubmissionState.NOT_REACHED
-        except Exception as e:
-            logger.exception('Fout bij controle submissie: %s',e)
-            analysis = [(None,None,None,"text","Er is iets fout gelopen, meld aan de lector.")]
-            submission.state = SubmissionState.NOT_REACHED
-            if not first_failed_or_unreached_submission:
-                first_failed_or_unreached_submission = submission
-        finally:
-            submission.save()
-    if first_failed_or_unreached_submission is not None:
-        # TODO: zou beter zijn hier een titel te voorzien, maar oké
-        return (first_failed_or_unreached_submission.content_uid,analysis)
-    else:
-        return (submissions[-1].content_uid,[]) # empty analysis if everything is okay
+        submission.checksum = checksum
+        if strategy_analysis is None or strategy_analysis.submission_state == SubmissionState.ACCEPTED:
+            strategy = exercise.strat
+            (strategy_analysis,components_analysis) = strategy.check_submission(submission,STUDENT_SOLUTION_DIR)
+            submission.state = strategy_analysis.submission_state
+        submission.save()
+    return (strategy_analysis,components_analysis)
 
 @celery_app.task(priority=0)
 def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
@@ -71,11 +53,9 @@ def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
     if len(checksum) == 40:
         return _check_submissions_in_commit(submissions,checksum)
     else:
-        with transaction.atomic():
-            for submission in submissions:
-                submission.state = SubmissionState.NOT_REACHED
-                submission.save()
-        return ("geen oefening bereikt",[(None,None,None,"text",f"Probleem bij het ophalen van je repository. Klopt de URL en bevat de repository minstens één bestand?")])
+        submissions[0].state = SubmissionState.NOT_REACHED
+        submission[0].save()
+        return (StrategyAnalysis(submission_state=SubmissionState.NOT_REACHED,submission_url=submissions[0].repo.url,submission_checksum=checksum),[])
 
 @celery_app.task(priority=1)
 def retrieve_submitted_files(submission_id,*args,**kwargs):
