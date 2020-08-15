@@ -27,7 +27,12 @@ class ContentView(View,LoginRequiredMixin):
     @classmethod
     def is_accessible_by_in(cls,user,course):
         graph = courses.course_graphs()[course]
-        v = graph.vs.find(label=cls.uid)
+        for v in graphs.vs:
+            print(v)
+        try:
+            v = graph.vs.find(label=cls.uid)
+        except ValueError:
+            return False
         preds = [e.source_vertex for e in graph.es.select(_to=v.index)]
         return all((p["contentview"].completed_by(user) for p in preds))
 
