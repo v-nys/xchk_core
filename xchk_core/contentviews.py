@@ -27,8 +27,6 @@ class ContentView(View,LoginRequiredMixin):
     @classmethod
     def is_accessible_by_in(cls,user,course):
         graph = courses.course_graphs()[course]
-        for v in graphs.vs:
-            print(v)
         try:
             v = graph.vs.find(label=cls.uid)
         except ValueError:
