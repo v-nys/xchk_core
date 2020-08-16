@@ -243,4 +243,4 @@ class Strategy:
         except Exception as e:
             logger.exception('Fout bij controle submissie: %s',e)
             return (StrategyAnalysis(submission_state=SubmissionState.NOT_REACHED,submission_url=submission.repo.url,submission_checksum=submission.checksum),[])
-        return (StrategyAnalysis(submission_state=SubmissionState.UNDECIDED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_refusing.components + outcome_analysis_accepting.components)
+        return (StrategyAnalysis(submission_state=SubmissionState.UNDECIDED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_refusing.outcomes_components + outcome_analysis_accepting.outcomes_components)
