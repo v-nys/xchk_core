@@ -238,7 +238,7 @@ class Strategy:
             if outcome_analysis_refusing.outcome:
                 return (StrategyAnalysis(submission_state=SubmissionState.REFUSED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_refusing.outcomes_components)
             outcome_analysis_accepting = self.accepting_check.check_submission(submission,student_path,desired_outcome=True,init_check_number=outcome_analysis_refusing.outcomes_components[-1].component_number,ancestor_has_alternatives=False)
-            if outcome_accepting:
+            if outcome_analysis_accepting.outcome:
                 return (StrategyAnalysis(submission_State=SubmissionState.ACCEPTED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_accepting.outcomes_components)
         except Exception as e:
             logger.exception('Fout bij controle submissie: %s',e)
