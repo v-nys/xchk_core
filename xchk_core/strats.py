@@ -48,12 +48,6 @@ class CheckingPredicate:
     def component_checks(self):
         return []
 
-    # TODO: deprecate?
-    # component FileExistsChecks tell us this, so component_checks would be enough...
-    def mentioned_files(self,exercise_name):
-        """This is here so we can easily check submitted relevant files through UI."""
-        return set()
-
     # alle properties moeten gelijk zijn en klasse moet gelijk zijn
     # overschrijven is nodig om `in` te gebruiken op ondersteunde checks batch type
     def __eq__(self,obj):
@@ -92,9 +86,6 @@ class Negation(CheckingPredicate):
         # negatie op zich mag altijd, hangt af van onderdelen...
         return self.negated_predicate.component_checks()
 
-    def mentioned_files(self,exercise_name):
-        return self.negated_predicate.mentioned_files(exercise_name)
-
     def check_submission(self,submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation=False,open=open):
         # cannot simply copy child analysis, because instructions are simplified through De Morgan
         # invert the desired outcome, but also invert the explanation in case of mismatch
@@ -108,9 +99,6 @@ class ConjunctiveCheck(CheckingPredicate):
 
     def __init__(self,conjuncts):
         self.conjuncts = conjuncts
-
-    def mentioned_files(self,exercise_name):
-        return set([fn for conjunct in self.conjuncts for fn in conjunct.mentioned_files(exercise_name)])
 
     def instructions(self,exercise_name):
         subinstructions = []
@@ -159,9 +147,6 @@ class FileExistsCheck(CheckingPredicate):
     def entry(self,exercise_name):
         return f'{self.name or exercise_name}{"." if self.extension else ""}{self.extension or ""}'
 
-    def mentioned_files(self,exercise_name):
-        return set(self.entry(exercise_name))
-
     def instructions(self,exercise_name):
         return [f'Je hebt een bestand met naam {self.entry(exercise_name)}']
 
@@ -189,9 +174,6 @@ class DisjunctiveCheck(CheckingPredicate):
 
     def __init__(self,disjuncts):
         self.disjuncts = disjuncts
-
-    def mentioned_files(self,exercise_name):
-        return set([fn for disjunct in self.disjuncts for fn in disjunct.mentioned_files(exercise_name)])
 
     def instructions(self,exercise_name):
         subinstructions = []
@@ -237,9 +219,6 @@ class Strategy:
     def __init__(self,refusing_check=Negation(TrueCheck()),accepting_check=Negation(TrueCheck())):
         self.refusing_check = refusing_check
         self.accepting_check = accepting_check
-
-    def mentioned_files(self,exercise_name):
-        return self.refusing_check.mentioned_files(exercise_name).union(self.accepting_check.mentioned_files(exercise_name))
 
     def component_checks(self):
         return self.refusing_check.component_checks() + self.accepting_check.component_checks()

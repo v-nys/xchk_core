@@ -67,14 +67,6 @@ def retrieve_submitted_files(submission_id,*args,**kwargs):
     subprocess.run(f'cd /tmp/submission{submission_id}; git checkout {submission.checksum}',shell=True)
     try:
         result = []
-        for mentioned_file in node.mentioned_files():
-            mentioned_path = os.path.join(f'/tmp/submission{submission_id}',mentioned_file)
-            if os.path.exists(mentioned_path):
-                with open(mentioned_path) as fh:
-                    single_file_result = (mentioned_file,'codelines',fh.readlines()) # code = algemene renderingstrategie? kan bv. zijn 'pygments',...
-                result.append(single_file_result)
-            else:
-                result.append((mentioned_file,'',False)) # dus file is er gewoon niet
         return result
     except Exception as e:
         return "Iets misgelopen bij het ophalen van de verplichte bestanden. Kan een verkeerde filename zijn, kan een fout bij uitlezen files zijn."
