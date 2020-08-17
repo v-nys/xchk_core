@@ -136,7 +136,7 @@ class ConjunctiveCheck(CheckingPredicate):
                 error_msg = f"Deze voorwaarde is een AND van alle instructies die er onder staan. AND moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"OR moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,rendered_data=f"<p>{error_msg}</p>" if exit_code != desired_outcome else None,acceptable_to_ancestor=exit_code == desired_outcome or ancestor_has_alternatives)] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,rendered_data=f"<p>{error_msg}</p>" if exit_code != desired_outcome else None,acceptable_to_ancestor=exit_code == desired_outcome or ancestor_has_alternatives)] + analysis_children)
 
 class FileExistsCheck(CheckingPredicate):
 
