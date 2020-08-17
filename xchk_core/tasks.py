@@ -24,19 +24,19 @@ STUDENT_SOLUTION_DIR = '/tmp/studentrepo'
 ############################################
 
 def _check_submissions_in_commit(submissions,checksum):
-    (strategy_analysis, components_analysis) = (None,[])
-    for submission in submissions:
-        # FIXME: dit is snelle test
-        # kan zijn dat foute UID is ingegeven (weliswaar alleen door geknoei van studenten of update server)
-        # TODO: kan ik dit efficiënter maken door niet meteen de volledige lijst op te bouwen en enkel eerste elemen van lazy list te nemen? bespaart check accessibility...
-        eligible_exercises = [content for content in contentviews.all_contentviews() if content.uid == submission.content_uid and content.is_accessible_by(submission.submitter)]
-        exercise = eligible_exercises[0]
-        submission.checksum = checksum
-        if strategy_analysis is None or strategy_analysis.submission_state == SubmissionState.ACCEPTED:
-            strategy = exercise.strat
-            (strategy_analysis,components_analysis) = strategy.check_submission(submission,STUDENT_SOLUTION_DIR)
-            submission.state = strategy_analysis.submission_state
-        submission.save()
+    # restant van oude aanpak
+    # nu is er telkens maar 1 submission
+    submission = submissions[0]
+    # FIXME: dit is snelle test
+    # kan zijn dat foute UID is ingegeven (weliswaar alleen door geknoei van studenten of update server)
+    # TODO: kan ik dit efficiënter maken door niet meteen de volledige lijst op te bouwen en enkel eerste elemen van lazy list te nemen? bespaart check accessibility...
+    eligible_exercises = [content for content in contentviews.all_contentviews() if content.uid == submission.content_uid and content.is_accessible_by(submission.submitter)]
+    exercise = eligible_exercises[0]
+    submission.checksum = checksum
+    strategy = exercise.strat
+    (strategy_analysis,components_analysis) = strategy.check_submission(submission,STUDENT_SOLUTION_DIR)
+    submission.state = strategy_analysis.submission_state
+    submission.save()
     return (strategy_analysis,components_analysis)
 
 @celery_app.task(priority=0)
@@ -50,26 +50,8 @@ def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
                               shell=True,\
                               capture_output=True).stdout.decode('utf-8').strip()
     submissions = [Submission.objects.get(id=submission_id) for submission_id in submission_ids]
-    if len(checksum) == 40:
-        return _check_submissions_in_commit(submissions,checksum)
-    else:
-        submissions[0].state = SubmissionState.NOT_REACHED
-        submission[0].save()
-        return (StrategyAnalysis(submission_state=SubmissionState.NOT_REACHED,submission_url=submissions[0].repo.url,submission_checksum=checksum),[])
-
-@celery_app.task(priority=1)
-def retrieve_submitted_files(submission_id,*args,**kwargs):
-    submission = Submission.objects.get(id=submission_id)
-    node = submission.exercise
-    repo = submission.repo
-    subprocess.run(f'rm -rf /tmp/submission{submission_id}',shell=True)
-    subprocess.run(f'git clone {repo.url} /tmp/submission{submission_id}',shell=True)
-    subprocess.run(f'cd /tmp/submission{submission_id}; git checkout {submission.checksum}',shell=True)
-    try:
-        result = []
-        return result
-    except Exception as e:
-        return "Iets misgelopen bij het ophalen van de verplichte bestanden. Kan een verkeerde filename zijn, kan een fout bij uitlezen files zijn."
+    # TODO: testen bij ontbrekende / lege repo
+    return _check_submissions_in_commit(submissions,checksum)
 
 # top priority for notification task
 # might as well notify users immediately...
@@ -81,10 +63,3 @@ def notify_result(strategy_analysis_and_components,group_name):
             {'type': 'completion',
              'strategy_analysis': strategy_analysis,
              'components': components})
-
-@celery_app.task(priority=9)
-def notify_submitted_files(files,group_name):
-    channel_layer = channels.layers.get_channel_layer()
-    async_to_sync(channel_layer.group_send)(group_name,
-            {'type': 'files', # tells consumer which callback to run
-             'files': files}) # callback arg, will be either string or list

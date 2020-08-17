@@ -1,37 +1,12 @@
 from channels.generic.websocket import WebsocketConsumer
 import json
-from .tasks import check_submission_batch, notify_result, retrieve_submitted_files, notify_submitted_files
+from .tasks import check_submission_batch, notify_result
 from .models import Repo, SubmissionState, Submission
 from django.utils import timezone
 from django.db import transaction
 import datetime
 from asgiref.sync import async_to_sync
 from . import contentviews, strats
-
-class SubmittedFilesConsumer(WebsocketConsumer):
-
-    def connect(self):
-        # TODO: nagaan of het in principe beter is aparte groepnamen te gebruiken t.o.v. CheckRequest?
-        self.group_name = f"user{self.scope['user'].id}"
-        async_to_sync(self.channel_layer.group_add)(
-            self.group_name,
-            self.channel_name
-        )
-        self.accept()
-
-    def disconnect(self, close_code):
-        async_to_sync(self.channel_layer.group_discard)(
-            self.group_name,
-            self.channel_name
-        )
-
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        if self.scope['user'].is_superuser:
-            retrieve_submitted_files.apply_async(args=[int(text_data_json['submission'])],link=notify_submitted_files.s(self.group_name),expires=300)
-
-    def files(self, event):
-        self.send(text_data=json.dumps({'files': event['files']}))
 
 class CheckRequestConsumer(WebsocketConsumer):
 

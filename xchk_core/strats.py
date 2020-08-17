@@ -233,6 +233,9 @@ class Strategy:
     def check_submission(self,submission,student_path):
         (outcome_refusing,analysis_refusing) = (None,[])
         (outcome_accepting,analysis_accepting) = (None,[])
+        general_error_analysis = (StrategyAnalysis(submission_state=SubmissionState.NOT_REACHED,submission_url=submission.repo.url,submission_checksum=submission.checksum),[])
+        if len(submission.checksum) != 40:
+            return general_error_analysis
         try:
             outcome_analysis_refusing = self.refusing_check.check_submission(submission,student_path,desired_outcome=False,init_check_number=1,ancestor_has_alternatives=False)
             if outcome_analysis_refusing.outcome:
@@ -242,5 +245,5 @@ class Strategy:
                 return (StrategyAnalysis(submission_state=SubmissionState.ACCEPTED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_accepting.outcomes_components)
         except Exception as e:
             logger.exception('Fout bij controle submissie: %s',e)
-            return (StrategyAnalysis(submission_state=SubmissionState.NOT_REACHED,submission_url=submission.repo.url,submission_checksum=submission.checksum),[])
+            return general_error_analysis
         return (StrategyAnalysis(submission_state=SubmissionState.UNDECIDED,submission_url=submission.repo.url,submission_checksum=submission.checksum),outcome_analysis_refusing.outcomes_components + outcome_analysis_accepting.outcomes_components)
