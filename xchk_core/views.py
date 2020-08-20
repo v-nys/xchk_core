@@ -41,13 +41,20 @@ def new_course_view(request,course_title):
     for v in graph.vs:
         uid = v["contentview"].uid
         if uid != 'impossible_node':
+            # TODO: code generates excessive number of queries
             if v["contentview"].is_accessible_by(request.user):
                 v["URL"] = reverse(f'{v["contentview"].uid}_view')
-                v["color"] = "black";
-                v["fontcolor"] = "black";
+                v["color"] = "black"
+                v["fontcolor"] = "black"
+                if v["contentview"].accepted_for(request.user):
+                    v["color"] = "green"
+                    v["fontcolor"] = "green"
+                elif v["contentview"].completed_by(request.user):
+                    v["color"] = "orange"
+                    v["fontcolor"] = "orange"
             else:
-               v["color"] = "gray";
-               v["fontcolor"] = "gray";
+               v["color"] = "gray"
+               v["fontcolor"] = "gray"
     graph.write_dot(f'/tmp/{course_title}.gv')
     with open(f'/tmp/{course_title}.gv') as fh:
         dotfile = fh.read()
