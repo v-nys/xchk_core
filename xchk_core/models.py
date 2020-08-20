@@ -55,7 +55,7 @@ class SubmissionV2(models.Model):
     state = enum.EnumField(SubmissionState, default=SubmissionState.QUEUED)
     submitter = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)
     feedback = models.TextField(null=True,blank=True)
-    content_uid = models.CharField(max_length=40,null=False)
+    content_uid = models.CharField(max_length=200,null=False)
 
     def __str__(self):
         return f"poging van {self.submitter}" +\
