@@ -1,7 +1,7 @@
 from channels.generic.websocket import WebsocketConsumer
 import json
 from .tasks import check_submission_batch, notify_result, retrieve_submitted_files, notify_submitted_files
-from .models import Repo, SubmissionState, SubmissionV2
+from .models import Repo, SubmissionState, Submission
 from django.utils import timezone
 from django.db import transaction
 import datetime
@@ -56,7 +56,7 @@ class CheckRequestConsumer(WebsocketConsumer):
         repo = Repo.objects.get(pk=int(text_data_json['repo']))
         # FIXME: there should be exactly one exercise...
         exercises = [contentview for contentview in contentviews.all_contentviews() if contentview.uid == text_data_json['exercise']]
-        recent_submissions = SubmissionV2.objects.filter(submitter=self.scope['user']).filter(timestamp__gte=datetime.datetime.now() - datetime.timedelta(seconds=15))
+        recent_submissions = Submission.objects.filter(submitter=self.scope['user']).filter(timestamp__gte=datetime.datetime.now() - datetime.timedelta(seconds=15))
         if len(recent_submissions) > 0 and not self.scope['user'].is_superuser:
             self.send(text_data=json.dumps({'last_reached_file': "geen bestand gecontroleerd", "analysis": [(None,None,None,"text","je mag maar één keer per vijftien seconden checken")]}))
             return
@@ -65,7 +65,7 @@ class CheckRequestConsumer(WebsocketConsumer):
             # TODO: is dit niet wat omslachtig? krijg de UID, ga hem omzetten naar een contentview, om dan hier toch maar gewoon id te geven?
             # kan gewoon de omzetting van data naar views overslaan? bekijk later
             for exercise in exercises:
-                submission = SubmissionV2(checksum=None,
+                submission = Submission(checksum=None,
                                           timestamp=datetime.datetime.now(),
                                           repo=repo,
                                           state=SubmissionState.QUEUED,

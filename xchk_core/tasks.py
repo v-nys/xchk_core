@@ -1,7 +1,7 @@
 from config import celery_app
 import channels.layers
 from asgiref.sync import async_to_sync
-from .models import Repo, SubmissionState, SubmissionV2
+from .models import Repo, SubmissionState, Submission
 from . import contentviews, courses, strats
 from .strats import OutcomeAnalysis, OutcomeComponent
 
@@ -49,7 +49,7 @@ def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
     checksum = subprocess.run(f'cd {STUDENT_SOLUTION_DIR} ; git rev-parse HEAD',\
                               shell=True,\
                               capture_output=True).stdout.decode('utf-8').strip()
-    submissions = [SubmissionV2.objects.get(id=submission_id) for submission_id in submission_ids]
+    submissions = [Submission.objects.get(id=submission_id) for submission_id in submission_ids]
     if len(checksum) == 40:
         return _check_submissions_in_commit(submissions,checksum)
     else:

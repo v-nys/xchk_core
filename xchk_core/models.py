@@ -48,7 +48,7 @@ class Repo(models.Model):
     class Meta:
         unique_together = [['user','course']]
 
-class SubmissionV2(models.Model):
+class Submission(models.Model):
     checksum = models.CharField(max_length=40,null=True)
     timestamp = models.DateTimeField()
     repo = models.ForeignKey(Repo, null=False, on_delete=models.CASCADE)
