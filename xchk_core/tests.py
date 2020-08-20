@@ -2,7 +2,7 @@ import unittest
 from django.test import TestCase
 from unittest.mock import Mock, patch, MagicMock
 from bs4 import BeautifulSoup
-from xchk_core.models import SubmissionV2
+from xchk_core.models import SubmissionV2, Repo
 from xchk_core.strats import *
 from xchk_core.templatetags.xchk_instructions import node_instructions_2_ul
 
@@ -77,6 +77,16 @@ class CheckSubmissionTest(TestCase):
         analysis = check.check_submission(SubmissionV2(),'/tmp/student',False,1,False)
         # third component irrevocably prevents desired outcome from being reached
         self.assertFalse(analysis.outcomes_components[3].acceptable_to_ancestor)
+
+    def test_undecidable_submission(self):
+        strat = Strategy(Negation(TrueCheck()),Negation(TrueCheck()))
+        submission = SubmissionV2()
+        submission.repo = Repo()
+        submission.repo.url = "www.google.be"
+        submission.checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        analysis = strat.check_submission(submission,'/tmp/student')
+        print(analysis)
+        self.assertTrue(False)
 
 class Instructions2HtmlTest(TestCase):
 
