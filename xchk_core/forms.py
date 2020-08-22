@@ -1,6 +1,6 @@
 from django import forms
 from .models import Repo, FeedbackTicket
-from . import strats, courses
+from . import strats
 
 class CheckRequestForm(forms.Form):
 
@@ -21,8 +21,9 @@ class FeedbackForm(forms.ModelForm):
 class RepoSelectionForm(forms.ModelForm):
 
     def __init__(self, owner, *args, **kwargs):
+        from . import courses
         uid = kwargs['uid']
-        super(RepoSelectionForm,self).__init__(*args,**kwargs)
+        super().__init__(*args,**kwargs)
         candidate_repos = Repo.objects.filter(user=owner)
         final_candidate_repos = []
         for repo in candidate_repos:

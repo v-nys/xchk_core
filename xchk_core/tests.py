@@ -144,6 +144,12 @@ class Instructions2HtmlTest(TestCase):
         soup2 = BeautifulSoup(intended,'html.parser')
         self.assertEqual(soup1.prettify(),soup2.prettify())
 
+class RepoFormTest(TestCase):
+
+    def test_can_import(self):
+        import xchk_core.forms
+        self.assertTrue(True)
+
 if __name__ == '__main__':
     unittest.main()
 
