@@ -4,7 +4,6 @@ from setuptools import setup
 packages = \
 ['xchk_core',
  'xchk_core.migrations',
- 'xchk_core.signals',
  'xchk_core.templatetags']
 
 package_data = \
