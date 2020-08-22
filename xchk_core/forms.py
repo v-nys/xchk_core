@@ -21,7 +21,6 @@ class FeedbackForm(forms.ModelForm):
 class RepoSelectionForm(forms.ModelForm):
 
     def __init__(self, owner, uid, courses, *args, **kwargs):
-        uid = kwargs['uid']
         super().__init__(*args,**kwargs)
         candidate_repos = Repo.objects.filter(user=owner)
         final_candidate_repos = []
