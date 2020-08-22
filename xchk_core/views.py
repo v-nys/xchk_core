@@ -13,7 +13,7 @@ import re
 import requests
 import itertools
 import graphviz as gv
-from .forms import CheckRequestFormSet, RepoSelectionForm, FeedbackForm
+from .forms import CheckRequestFormSet, RepoSelectionForm
 from .models import Repo, SubmissionState
 from . import courses
 from django.forms import ChoiceField
@@ -67,32 +67,6 @@ def new_course_view(request,course_title):
             if repo:
                 data['repo_id'] = repo.id
             return render(request,'xchk_core/course_overview.html',data)
-
-def node_feedback_view(request,node_pk):
-    form = FeedbackForm(request.POST)
-    if form.is_valid():
-        ticket = form.instance
-        ticket.sender = request.user
-        ticket.node = Node.objects.get(pk=node_pk)
-        ticket.timestamp = datetime.datetime.now()
-        ticket.save()
-        messages.success(request, "Je feedback is geregistreerd. Bedankt!")
-    else:
-        messages.error(request, "Je feedback bevatte ongeldige data.")
-    return redirect('checkerapp:node_view',node_pk)
-
-def course_feedback_view(request,course_pk):
-    form = FeedbackForm(request.POST)
-    if form.is_valid():
-        ticket = form.instance
-        ticket.sender = request.user
-        ticket.course = Course.objects.get(pk=course_pk)
-        ticket.timestamp = datetime.datetime.now()
-        ticket.save()
-        messages.success(request, "Je feedback is geregistreerd. Bedankt!")
-    else:
-        messages.error(request, "Je feedback bevatte ongeldige data.")
-    return redirect('checkerapp:course_view',course_pk)
 
 class CreateRepoView(LoginRequiredMixin,CreateView):
     model = Repo

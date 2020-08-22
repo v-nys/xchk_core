@@ -26,7 +26,6 @@ def boot_django():
             "django.contrib.auth",
             "django.contrib.contenttypes",
             "django.contrib.sites",
-            "pinax.notifications",
             "xchk_core",
         ),
     )

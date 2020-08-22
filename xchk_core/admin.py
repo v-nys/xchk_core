@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from .models import Repo, FeedbackTicket, Submission
+from .models import Repo, Submission
 
 class RepoForm(forms.ModelForm):
     class Meta:
@@ -14,9 +14,5 @@ class RepoAdmin(admin.ModelAdmin):
 class SubmissionAdmin(admin.ModelAdmin):
     list_filter = ('state','exercise','submitter__username','timestamp')
 
-class FeedbackTicketAdmin(admin.ModelAdmin):
-    list_filter = ('feedback_type',)
-
 admin.site.register(Submission)
 admin.site.register(Repo, RepoAdmin)
-admin.site.register(FeedbackTicket,FeedbackTicketAdmin)

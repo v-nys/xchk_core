@@ -1,5 +1,5 @@
 from django import forms
-from .models import Repo, FeedbackTicket
+from .models import Repo
 from . import strats
 
 class CheckRequestForm(forms.Form):
@@ -8,15 +8,6 @@ class CheckRequestForm(forms.Form):
         super(CheckRequestForm,self).__init__(*args,**kwargs)
         numbered_exercises = [(node.pk,str(node)) for node in exercises] # if node.is_accessible_by(user)] uitgeschakeld zodat studenten Bruce alles kunnen checken
         self.fields['exercise'] = forms.ChoiceField(choices=numbered_exercises)
-
-class FeedbackForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(FeedbackForm,self).__init__(*args,**kwargs)
-
-    class Meta:
-        model = FeedbackTicket
-        fields = ['feedback_type', 'message']
 
 class RepoSelectionForm(forms.ModelForm):
 

@@ -31,17 +31,6 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 category = "main"
-description = "A helper class for handling configuration defaults of packaged apps gracefully."
-name = "django-appconf"
-optional = false
-python-versions = "*"
-version = "1.0.4"
-
-[package.dependencies]
-django = "*"
-
-[[package]]
-category = "main"
 description = "Custom Django field for using enumerations of named constants"
 name = "django-enumfield"
 optional = false
@@ -79,18 +68,6 @@ version = "0.10.1"
 all = ["pytest", "sphinx", "numpydoc"]
 doc = ["sphinx", "numpydoc"]
 test = ["pytest"]
-
-[[package]]
-category = "main"
-description = "User notification management for the Django web framework"
-name = "pinax-notifications"
-optional = false
-python-versions = "*"
-version = "6.0.0"
-
-[package.dependencies]
-django = ">=2.2"
-django-appconf = ">=1.0.1"
 
 [[package]]
 category = "main"
@@ -147,7 +124,7 @@ python-versions = "*"
 version = "1.6.2"
 
 [metadata]
-content-hash = "43c1070e82b2a317a4610b18012caafa501935824cfe5992d3eb92b3c0b7a307"
+content-hash = "7e8c828cd01e2326ce0a463498b09802418120e784868378bdafb2868079459e"
 lock-version = "1.0"
 python-versions = "^3.7"
 
@@ -160,10 +137,6 @@ beautifulsoup4 = [
 django = [
     {file = "Django-2.2.15-py3-none-any.whl", hash = "sha256:91f540000227eace0504a24f508de26daa756353aa7376c6972d7920bc339a3a"},
     {file = "Django-2.2.15.tar.gz", hash = "sha256:3e2f5d172215862abf2bac3138d8a04229d34dbd2d0dab42c6bf33876cc22323"},
-]
-django-appconf = [
-    {file = "django-appconf-1.0.4.tar.gz", hash = "sha256:be58deb54a43d77d2e1621fe59f787681376d3cd0b8bd8e4758ef6c3a6453380"},
-    {file = "django_appconf-1.0.4-py2.py3-none-any.whl", hash = "sha256:1b1d0e1069c843ebe8ae5aa48ec52403b1440402b320c3e3a206a0907e97bb06"},
 ]
 django-enumfield = [
     {file = "django-enumfield-2.0.1.tar.gz", hash = "sha256:867aa4ac96b58c4834ce060402da5e14b41366806a1cd89170567c4c4f93a626"},
@@ -196,10 +169,6 @@ iteration-utilities = [
     {file = "iteration_utilities-0.10.1-cp38-cp38-win32.whl", hash = "sha256:82bd428ae468b01230d5415f98373256067cf17ce7f754f031f1c7f43e322f52"},
     {file = "iteration_utilities-0.10.1-cp38-cp38-win_amd64.whl", hash = "sha256:8233731c39d614b4939557fa409b57fe136c7570aa54d57bffe0271fe9682424"},
     {file = "iteration_utilities-0.10.1.tar.gz", hash = "sha256:536e3e87c5c139c775f9d95bb771c4b366a1d58eb7a39436d4ac839b53742569"},
-]
-pinax-notifications = [
-    {file = "pinax-notifications-6.0.0.tar.gz", hash = "sha256:ca6effcab2cdc5b9863b9434fd8c78ae7738b0c2b94aec28c25730aa4ff50578"},
-    {file = "pinax_notifications-6.0.0-py3-none-any.whl", hash = "sha256:e86d96fc69d2b2d2feae4a4bfc715b35c88a5fb6fcf8f569264559465fd6e367"},
 ]
 python-igraph = [
     {file = "python-igraph-0.8.2.tar.gz", hash = "sha256:4601638d7d22eae7608cdf793efac75e6c039770ec4bd2cecf76378c84ce7d72"},

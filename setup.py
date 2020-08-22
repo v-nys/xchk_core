@@ -14,7 +14,6 @@ install_requires = \
 ['django-enumfield>=2.0.1,<3.0.0',
  'django>=2.2,<3.0',
  'graphviz>=0.14.1,<0.15.0',
- 'pinax-notifications>=6.0.0,<7.0.0',
  'python-igraph>=0.8.2,<0.9.0',
  'iteration-utilities>=0.10.1,<0.11.0']
 
