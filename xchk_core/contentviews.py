@@ -45,7 +45,7 @@ class ContentView(View,LoginRequiredMixin):
         return any((submission.state == SubmissionState.ACCEPTED for submission in submissions))
 
     def get(self,request,*args,**kwargs):
-        repoform = RepoSelectionForm(owner=request.user)
+        repoform = RepoSelectionForm(owner=request.user,uid=self.uid,courses=courses.courses())
         user = request.user
         if self.__class__.is_accessible_by(user):
             instructions = self.strat.instructions(self.uid)

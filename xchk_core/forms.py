@@ -20,14 +20,13 @@ class FeedbackForm(forms.ModelForm):
 
 class RepoSelectionForm(forms.ModelForm):
 
-    def __init__(self, owner, *args, **kwargs):
-        from . import courses
+    def __init__(self, owner, uid, courses, *args, **kwargs):
         uid = kwargs['uid']
         super().__init__(*args,**kwargs)
         candidate_repos = Repo.objects.filter(user=owner)
         final_candidate_repos = []
         for repo in candidate_repos:
-            course = courses.courses()[repo.course]
+            course = courses[repo.course]
             for (contentview,_) in course.structure:
                 if contentview.uid == uid:
                     final_candidate_repos.append(repo)
