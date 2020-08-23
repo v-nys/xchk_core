@@ -26,6 +26,7 @@ def index_view(request):
 def test_gitea_view(request):
     # using HTTP here!
     url = 'http://gitea:3000/api/v1/orgs'
+    url = 'http://somethingelsewhichdoesnotexistforcertain:3000/api/v1/orgs'
     data = {'UserName': 'myneworganization'}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
     response = requests.post(url, data=data, headers=headers)
