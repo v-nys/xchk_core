@@ -126,7 +126,7 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
         url = 'http://gitea:3000/api/v1/admin/users/{self.request.user.username}/repos'
         data = {'auto_init': True,
                 'default_branch': 'master',
-                'description': f'repo for {form.course} xchk course',
+                'description': f'repo for {form.instance.course} xchk course',
                 'name': f'{form.instance.course}',
                 'private': True}
         headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
