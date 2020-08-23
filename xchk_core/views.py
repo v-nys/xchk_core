@@ -24,7 +24,8 @@ def index_view(request):
     return render(request,'xchk_core/index.html')
 
 def test_gitea_view(request):
-    url = 'gitea:3000/api/v1/orgs'
+    # using HTTP here!
+    url = 'http://gitea:3000/api/v1/orgs'
     data = {'UserName': 'myneworganization'}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
     response = requests.post(url, data=data, headers=headers)

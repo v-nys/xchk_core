@@ -8,7 +8,6 @@ from .strats import OutcomeAnalysis, OutcomeComponent
 import os
 import subprocess
 from contextlib import redirect_stdout
-import environ
 import logging
 import time
 from django.db import transaction
