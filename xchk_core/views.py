@@ -32,6 +32,10 @@ def test_gitea_view(request):
                            'default_branch': 'master',
                            'description': 'repo for xchk',
                            'name': 'my_first_repo',
+                           'gitignores': '',
+                           'issue_labels': '',
+                           'licsense': 'Unlicense',
+                           'readme': 'README.txt',
                            'private': True}}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
     response = requests.post(url, data=json.dumps(data), headers=headers)
