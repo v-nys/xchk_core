@@ -123,6 +123,15 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        url = 'http://gitea:3000/api/v1/admin/users/{self.request.user.username}/repos'
+        data = {'auto_init': True,
+                'default_branch': 'master',
+                'description': 'repo for {form.course} xchk course',
+                'name': 'form.course',
+                'private': True}
+        headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
+        response = requests.post(url, data=json.dumps(data), headers=headers)
+
         return super(CreateRepoView,self).form_valid(form)
 
 class DeleteRepoView(LoginRequiredMixin,DeleteView):
