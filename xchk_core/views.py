@@ -127,7 +127,7 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
         data = {'auto_init': True,
                 'default_branch': 'master',
                 'description': f'repo for {form.course} xchk course',
-                'name': f'{form.course}',
+                'name': f'{form.instance.course}',
                 'private': True}
         headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
         response = requests.post(url, data=json.dumps(data), headers=headers)
