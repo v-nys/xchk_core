@@ -17,9 +17,18 @@ from .forms import CheckRequestFormSet, RepoSelectionForm, FeedbackForm
 from .models import Repo, SubmissionState
 from . import courses
 from django.forms import ChoiceField
+from django.conf import settings
+import requests
 
 def index_view(request):
     return render(request,'xchk_core/index.html')
+
+def test_gitea_view(request):
+    url = 'gitea:3000/api/v1/orgs'
+    data = {'UserName': 'myneworganization'}
+    headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
+    response = requests.post(url, data=data, headers=headers)
+    return render(request, 'checkerapp/gitea_test_result.html',{'response':response})
 
 @login_required
 def submission_view(request,submission_pk):
