@@ -125,6 +125,7 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
         form.instance.user = self.request.user
         # TODO: aanpassen naar self.request.user.username?
         # niet zeker van waar 404 anders zou komen.
+        print(self.request.user.username)
         url = 'http://gitea:3000/api/v1/admin/users/vincent/repos'
         data = {'auto_init': True,
                 'default_branch': 'master',
