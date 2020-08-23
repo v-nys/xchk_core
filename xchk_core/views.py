@@ -131,7 +131,7 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
                 'private': True}
         headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
         response = requests.post(url, data=json.dumps(data), headers=headers)
-
+        print(response)
         return super(CreateRepoView,self).form_valid(form)
 
 class DeleteRepoView(LoginRequiredMixin,DeleteView):
