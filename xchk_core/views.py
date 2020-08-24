@@ -82,6 +82,7 @@ def new_course_view(request,course_title):
             data = {'graph':fh2.read(), 'supplied_dependencies': dependencies}
             if repo:
                 data['repo_id'] = repo.id
+                data['clone_command'] = f'git clone {repo.url}'
             return render(request,'xchk_core/course_overview.html',data)
 
 def node_feedback_view(request,node_pk):

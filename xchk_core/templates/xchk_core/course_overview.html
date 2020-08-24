@@ -7,6 +7,7 @@
 {% endautoescape %}
 
 {% if repo_id %}
+<code>{{ clone_command }}</code>
 <a href="{% url 'checkerapp:delete_repo_view' repo_id %}">Mijn repository voor deze cursus verwijderen.</a>
 {% endif %}
  
