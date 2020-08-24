@@ -17,11 +17,14 @@ def create_gitea_account(request, user, **kwargs):
     print(dir(user))
     url = f'http://gitea:3000/api/v1/admin/users'
     data = {'email' : user.email,
-            'login_name' : user.username,
+            'username' : user.username,
             'must_change_password' : True,
             'password' : user.initial_pw}
     headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
     response = requests.post(url, data=json.dumps(data), headers=headers)
+    print(user.email)
+    print(user.username)
+    print(user.initial_pw)
     print('response 1')
     print(response)
     key = rsa.generate_private_key(
