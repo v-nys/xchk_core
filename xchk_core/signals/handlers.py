@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 
 @receiver(user_signed_up)
-def create_gitea_account(request, user):
+def create_gitea_account(request, user, **kwargs):
     print(dir(user))
     url = f'http://gitea:3000/api/v1/admin/users'
     data = {'email' : user.email,
