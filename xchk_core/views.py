@@ -135,7 +135,8 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
         url = f'http://gitea:3000/api/v1/repos/{self.request.user.username}/{form.instance.course}/collaborators/vincent'
         data = {'permission': 'admin'}
         collab_response = requests.put(url, data=json.dumps(data), headers=headers)
-        form.instance.url = repo_response['ssh_url']
+        # response is json response
+        form.instance.url = repo_response.json()['ssh_url']
         return super(CreateRepoView,self).form_valid(form)
 
 class DeleteRepoView(LoginRequiredMixin,DeleteView):
