@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 import requests
+import json
 
 @receiver(user_signed_up)
 def create_gitea_account(request, user, **kwargs):
