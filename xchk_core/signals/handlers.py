@@ -2,10 +2,21 @@ from django.conf import settings
 from django.utils.translation import ugettext_noop as _
 from django.db.models.signals import pre_save, post_migrate, post_save
 from django.dispatch import receiver
+from allauth.account.signals import user_signed_up
 from ..models import FeedbackTicket, FeedbackType
 from pinax.notifications.models import send_now
 from django.core.exceptions import ObjectDoesNotExist
 
+@receiver(user_signed_up)
+def create_gitea_account(request, user):
+    url = f'http://gitea:3000/api/v1/admin/users'
+    data = {'email' : user.email,
+            'login_name' : user.username,
+            'must_change_password' : True,
+            'password' : 'DEFAULTPW'}
+    headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    print(response)
 
 @receiver(post_migrate)
 def create_notice_types(sender, **kwargs): 
