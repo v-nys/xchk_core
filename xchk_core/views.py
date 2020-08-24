@@ -112,7 +112,7 @@ def course_feedback_view(request,course_pk):
 
 class CreateRepoView(LoginRequiredMixin,CreateView):
     model = Repo
-    fields = ['course','url']
+    fields = ['course']
     success_url = reverse_lazy('checkerapp:index')
 
     # TODO: controleren dat cursus voorkomt als titel in courses.py
@@ -123,7 +123,6 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
         return form
 
     def form_valid(self, form):
-        # TODO: admin collaborator maken van deze repo
         form.instance.user = self.request.user
         url = f'http://gitea:3000/api/v1/admin/users/{self.request.user.username}/repos'
         data = {'auto_init': True,
@@ -136,6 +135,7 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
         url = f'http://gitea:3000/api/v1/repos/{self.request.user.username}/{form.instance.course}/collaborators/vincent'
         data = {'permission': 'admin'}
         collab_response = requests.put(url, data=json.dumps(data), headers=headers)
+        form.instance.url = repo_response['ssh_url']
         return super(CreateRepoView,self).form_valid(form)
 
 class DeleteRepoView(LoginRequiredMixin,DeleteView):
