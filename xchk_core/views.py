@@ -26,7 +26,8 @@ def index_view(request):
 
 def test_gitea_view(request):
     # using HTTP here!
-    url = 'http://gitea:3000/api/v1/admin/users/vincent/repos'
+    # test: maakt een repo aan
+    url = f'http://gitea:3000/api/v1/admin/users/{request.user.username}/repos'
     data = {'auto_init': True,
             'default_branch': 'master',
             'description': 'repo for xchk',
@@ -122,6 +123,7 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
         return form
 
     def form_valid(self, form):
+        # TODO: admin collaborator maken van deze repo
         form.instance.user = self.request.user
         url = f'http://gitea:3000/api/v1/admin/users/{self.request.user.username}/repos'
         data = {'auto_init': True,
@@ -130,8 +132,10 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
                 'name': f'{form.instance.course}',
                 'private': True}
         headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
-        response = requests.post(url, data=json.dumps(data), headers=headers)
-        print(response)
+        repo_response = requests.post(url, data=json.dumps(data), headers=headers)
+        url = f'http://gitea:3000/api/v1/repos/{self.request.user.username}/{form.instance.course}/collaborators/vincent'
+        data = {'permission': 'admin'}
+        collab_response = requests.put(url, data=json.dumps(data), headers=headers)
         return super(CreateRepoView,self).form_valid(form)
 
 class DeleteRepoView(LoginRequiredMixin,DeleteView):
