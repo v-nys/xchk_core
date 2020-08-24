@@ -63,7 +63,7 @@ class CheckingPredicate:
         components = [OutcomeComponent(component_number=init_check_number,
                                        outcome=True,
                                        desired_outcome=desired_outcome,
-                                       rendered_data=f"<p>Aan false kan nooit voldaan zijn.</p>" if not desired_outcome else None,
+                                       rendered_data=f"<p>Aan de gewenste uitkomst, <code>false</code>, kan nooit voldaan zijn.</p>" if not desired_outcome else None,
                                        acceptable_to_ancestor=desired_outcome or ancestor_has_alternatives)]
         return OutcomeAnalysis(outcome=True,
                                outcomes_components=components)
