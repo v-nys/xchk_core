@@ -66,8 +66,8 @@ def new_course_view(request,course_title):
                     v["color"] = "green"
                     v["fontcolor"] = "green"
                 elif v["contentview"].completed_by(request.user):
-                    v["color"] = "orange"
-                    v["fontcolor"] = "orange"
+                    v["color"] = "blue"
+                    v["fontcolor"] = "blue"
             else:
                v["color"] = "gray"
                v["fontcolor"] = "gray"
