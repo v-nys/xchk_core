@@ -23,7 +23,7 @@ def invert_edges(dependency_graph):
     inverted = []
     for (dependent,dependencies) in dependency_graph:
         for dependency in dependencies:
-            existing_pair = filter(lambda x: x[0] is dependency, inverted)
+            existing_pair = list(filter(lambda x: x[0] is dependency, inverted))[0]
             list_of_dependents = existing_pair[1] if existing_pair else []
             if not list_of_dependents:
                 inverted.append((dependency,list_of_dependents))
