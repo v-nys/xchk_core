@@ -1,4 +1,5 @@
 from . import contentviews as cv
+from functools import lru_cache
 import importlib
 import os
 import igraph
@@ -19,27 +20,15 @@ def courses():
         course_dict[course.uid] = course
     return course_dict
 
-# TODO: memoize?
-def course_graphs():
-    graphs = {}
-    for course in courses():
-        graph = igraph.Graph(directed=True)
-        graphs[course] = graph
-        node_set = set()
-        for (dependent,dependencies) in courses()[course].structure:
-            node_set.add(dependent)
-            for dependency in dependencies:
-                node_set.add(dependency)
-        node_lst = list(node_set) # zo heeft alles meteen een nummer
-        graph.add_vertices(len(node_lst))
-        for (idx,content) in enumerate(node_lst):
-            graph.vs[idx]["contentview"] = content
-            graph.vs[idx]["label"] = content.uid
-        # edges toevoegen... lastig, want info is er niet meer
-        # zal gewoon nog eens moeten traversen
-        for (dependent,dependencies) in courses()[course].structure:
-            dependent_idx = [v.index for v in graph.vs if v["contentview"] == dependent][0]
-            for dependency in dependencies:
-                dependency_idx = [v.index for v in graph.vs if v["contentview"] == dependency][0]
-                graph.add_edges([(dependency_idx,dependent_idx)])
-    return graphs
+@lru_cache
+def invert_edges(dependency_graph):
+    inverted = []
+    for (dependent,dependencies) in dependency_graph:
+        for dependency in dependencies:
+            existing_pair = filter(lambda x: x[0] is dependency, inverted)
+            list_of_dependents = existing_pair[1] if existing_pair else []
+            if not list_of_dependents:
+                inverted.append((dependency,list_of_dependents))
+            list_of_dependents.append(dependent)
+    return inverted
+

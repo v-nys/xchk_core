@@ -2,9 +2,7 @@
 {% load static %}
 {% block content %}
 
-{% autoescape off %}
-    {{ graph }}
-{% endautoescape %}
+{{ toc|safe }}
 
 {% if repo_id %}
 <code>{{ clone_command }}</code>

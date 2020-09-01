@@ -46,44 +46,29 @@ def submission_view(request,submission_pk):
 
 @login_required
 def new_course_view(request,course_title):
+    def _dependency_pair_toc_entry(dp,inverted_course):
+        dependency = dp[0]
+        dependents = dp[1]
+        # TODO: add css class indicating whether completed/reachable/...
+        # TODO: add URL
+        outcome = f'<li>{dependency.cv_class}<ul>'
+        outcome += ''.join([_dependency_pair_toc_entry(next_lvl) for next_lvl in inverted_course if next_lvl[0] in dependents])
+        outcome += '</ul><li>'
     repo = None
     try:
         repo = Repo.objects.filter(user=request.user).get(course=course_title)
     except ObjectDoesNotExist as e:
         if not request.user.is_superuser:
             raise e
+    # from dependent to dependencies
     course = courses.courses()[course_title]
-    graph = courses.course_graphs()[course_title]
-    for v in graph.vs:
-        uid = v["contentview"].uid
-        if uid != 'impossible_node':
-            # TODO: code generates excessive number of queries
-            if v["contentview"].is_accessible_by(request.user):
-                v["URL"] = reverse(f'{v["contentview"].uid}_view')
-                v["color"] = "black"
-                v["fontcolor"] = "black"
-                if v["contentview"].accepted_for(request.user):
-                    v["color"] = "green"
-                    v["fontcolor"] = "green"
-                elif v["contentview"].completed_by(request.user):
-                    v["color"] = "orange"
-                    v["fontcolor"] = "orange"
-            else:
-               v["color"] = "gray"
-               v["fontcolor"] = "gray"
-    graph.write_dot(f'/tmp/{course_title}.gv')
-    with open(f'/tmp/{course_title}.gv') as fh:
-        dotfile = fh.read()
-        outpath = gv.render('dot','svg',f'/tmp/{course_title}.gv')
-        with open(outpath) as fh2:
-            # igraph always numbers vertices
-            # so we have to get dependencies from graph, not course
-            dependencies = {str(v.index) : [str(e.source) for e in graph.es.select(_target=v)] for v in graph.vs}
-            data = {'graph':fh2.read(), 'supplied_dependencies': dependencies}
-            if repo:
-                data['repo_id'] = repo.id
-                data['clone_command'] = f'git clone {repo.url}'
-            return render(request,'xchk_core/course_overview.html',data)
+    # from dependency to dependents
+    inverted_course = courses.invert_edges(course)
+    independent_nodes = [pair[0] for pair in course if not pair[1]]
+    ul_representation = '<ul>'
+    ul_representation += ''.join([_dependency_pair_toc_entry(pair,inverted_course) for pair in filter(lambda x: x[0] in independent_nodes,inverted_course)])
+    ul_representation += '</ul>'
+    return render(request,'xchk_core/course_overview.html',{'toc':ul_representation})
 
 def node_feedback_view(request,node_pk):
     form = FeedbackForm(request.POST)

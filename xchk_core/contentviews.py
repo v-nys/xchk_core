@@ -22,17 +22,19 @@ class ContentView(View,LoginRequiredMixin):
 
     @classmethod
     def is_accessible_by(cls,user):
-        return user.is_superuser or any(cls.is_accessible_by_in(user,course) for course in courses.courses())
+        return True
+        # return user.is_superuser or any(cls.is_accessible_by_in(user,course) for course in courses.courses())
 
     @classmethod
     def is_accessible_by_in(cls,user,course):
-        graph = courses.course_graphs()[course]
-        try:
-            v = graph.vs.find(label=cls.uid)
-        except ValueError:
-            return False
-        preds = [e.source_vertex for e in graph.es.select(_to=v.index)]
-        return all((p["contentview"].completed_by(user) for p in preds))
+        return True
+        # graph = courses.course_graphs()[course]
+        # try:
+        #     v = graph.vs.find(label=cls.uid)
+        # except ValueError:
+        #     return False
+        # preds = [e.source_vertex for e in graph.es.select(_to=v.index)]
+        # return all((p["contentview"].completed_by(user) for p in preds))
 
     @classmethod
     def completed_by(cls,user):
