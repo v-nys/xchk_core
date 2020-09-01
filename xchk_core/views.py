@@ -50,7 +50,7 @@ def new_course_view(request,course_title):
         dependents = dp[1]
         # TODO: add css class indicating whether completed/reachable/...
         # TODO: add URL
-        outcome = f'<li>{dependency.cv_class}<ul>'
+        outcome = f'<li>{dependency.title}<ul>'
         outcome += ''.join([_dependency_pair_toc_entry(next_lvl) for next_lvl in inverted_course if next_lvl[0] in dependents])
         outcome += '</ul><li>'
     repo = None
