@@ -62,8 +62,8 @@ def new_course_view(request,course_title):
     # from dependent to dependencies
     course = courses.courses()[course_title]
     # from dependency to dependents
-    inverted_course = courses.invert_edges(course)
-    independent_nodes = [pair[0] for pair in course if not pair[1]]
+    inverted_course = courses.invert_edges(course.structure)
+    independent_nodes = [pair[0] for pair in course.structure if not pair[1]]
     ul_representation = '<ul>'
     ul_representation += ''.join([_dependency_pair_toc_entry(pair,inverted_course) for pair in filter(lambda x: x[0] in independent_nodes,inverted_course)])
     ul_representation += '</ul>'
