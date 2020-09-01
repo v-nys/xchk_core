@@ -53,6 +53,7 @@ def new_course_view(request,course_title):
         outcome = f'<li>{dependency.title}<ul>'
         outcome += ''.join([_dependency_pair_toc_entry(next_lvl,inverted_course) for next_lvl in inverted_course if next_lvl[0] in dependents])
         outcome += '</ul><li>'
+        return outcome
     repo = None
     try:
         repo = Repo.objects.filter(user=request.user).get(course=course_title)
