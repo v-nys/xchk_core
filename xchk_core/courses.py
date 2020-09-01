@@ -1,5 +1,4 @@
 from . import contentviews as cv
-from functools import lru_cache
 import importlib
 import os
 from django.conf import settings
@@ -19,7 +18,7 @@ def courses():
         course_dict[course.uid] = course
     return course_dict
 
-@lru_cache
+# TODO: maybe memoize in the future?
 def invert_edges(dependency_graph):
     inverted = []
     for (dependent,dependencies) in dependency_graph:
@@ -30,4 +29,3 @@ def invert_edges(dependency_graph):
                 inverted.append((dependency,list_of_dependents))
             list_of_dependents.append(dependent)
     return inverted
-
