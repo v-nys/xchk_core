@@ -12,7 +12,6 @@ import datetime
 import re
 import requests
 import itertools
-import graphviz as gv
 from .forms import CheckRequestFormSet, RepoSelectionForm, FeedbackForm
 from .models import Repo, SubmissionState
 from . import courses

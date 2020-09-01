@@ -2,7 +2,6 @@ from . import contentviews as cv
 from functools import lru_cache
 import importlib
 import os
-import igraph
 from django.conf import settings
 
 class Course:
