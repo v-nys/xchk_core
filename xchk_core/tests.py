@@ -261,13 +261,15 @@ class TOCifyTest(TestCase):
 
     def test_ulify(self):
         mock_request = MagicMock()
-        # TODO: make CVXY contentview classes for purpose of testing
-        # could actually use those for preceding tests if I nest them inside test class
         structure = [[CV1A,[CV2A,[CV3A]]],
                      [CV1B,[CV2A,[CV3A]],
                            [CV2B,[CV3A]]],
                      [CV1C,[CV2B,[CV3A]]]]
         outcome = ulify(self.tocified,mock_request,'mycourse',reverse_func = lambda x: "http://www.google.com")
+        # TODO: verwachting al aangepast om te prunen, code nog laten doen
+        # TODO: klassen toevoegen op basis van al dan niet aanvaard (en variatie in data voorzien)
+        # TODO: klasse op basis van UID voorzien zodat target aanduiden mogelijk is
+        # TODO: klasse toevoegen aan de globale lijst of aan alle list entries zodat target icoontje kan worden voorzien
         expected = '''
 <ul>
   <li>lvl1a
@@ -281,11 +283,7 @@ class TOCifyTest(TestCase):
   </li>
   <li>lvl1b
     <ul>
-      <li>lvl2a
-        <ul>
-          <li>lvl3a</li>
-        </ul>
-      </li>
+      <li>lvl2a</li>
       <li>lvl2b
         <ul>
           <li>lvl3a</li>
@@ -295,11 +293,7 @@ class TOCifyTest(TestCase):
   </li>
   <li>lvl1c
     <ul>
-      <li>lvl2b
-        <ul>
-          <li>lvl3a</li>
-        </ul>
-      </li>
+      <li>lvl2b</li>
     </ul>
   </li>
 </ul>'''
