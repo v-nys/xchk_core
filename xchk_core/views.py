@@ -59,10 +59,24 @@ def new_course_view(request,course_title):
     ul_representation = ulify(tocified,request,course_title)
     return render(request,'xchk_core/course_overview.html',{'toc':ul_representation})
 
-def ulify(tocified,request,course_title):
-    print(tocified)
+def ulify(tocified,request,course_title,reverse_func=reverse):
+    # toevoegen link
+    # toevoegen target knop? kan dit laatste mss beter via CSS doen, zoals bij uitleg instructies
     def _entry_to_li(e):
-        output = f'<li>{e[0]}'
+        classes = []
+        if e[0].accepted_for(request.user):
+            classes.append('accepted')
+        elif e[0].completed_by(request.user):
+            classes.append('undecided')
+        if not e[0].is_accessible_by(request.user):
+            classes.append('locked')
+        output = f'<li'
+        if classes:
+            output += f' class="{" ".join([cls for cls in classes])}"'
+        output += f'>'
+        output += f'<a href="{reverse_func(e[0].uid + "_view")}">'
+        output += '</a>'
+        output += f'{e[0]}'
         output += f'<ul>{"".join([_entry_to_li(nested) for nested in e[1:]])}</ul>' if e[1:] else ''
         output += '</li>'
         return output

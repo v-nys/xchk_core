@@ -6,6 +6,7 @@ from xchk_core.models import Submission, Repo
 from xchk_core.strats import *
 from xchk_core.courses import courses, tocify, invert_edges
 from xchk_core.views import ulify
+from xchk_core.contentviews import ContentView
 from xchk_core.templatetags.xchk_instructions import node_instructions_2_ul
 
 class TrueCheckInstructionGenerationTest(TestCase):
@@ -152,36 +153,121 @@ class RepoFormTest(TestCase):
         import xchk_core.forms
         self.assertTrue(True)
 
+class CV1A(ContentView):
+    uid = 'CV1A'
+    title = 'CV1A'
+
+    @classmethod
+    def is_accessible_by(cls,user):
+        return True
+
+    @classmethod
+    def accepted_for(cls,user):
+        return True
+
+class CV2A(ContentView):
+    uid = 'CV2A'
+    title = 'CV2A'
+
+    @classmethod
+    def is_accessible_by(cls,user):
+        return True
+
+    @classmethod
+    def accepted_for(cls,user):
+        return True
+
+
+class CV3A(ContentView):
+    uid = 'CV3A'
+    title = 'CV3A'
+
+    @classmethod
+    def is_accessible_by(cls,user):
+        return True
+
+    @classmethod
+    def accepted_for(cls,user):
+        return True
+
+
+
+class CV1B(ContentView):
+    uid = 'CV1B'
+    title = 'CV1B'
+
+    @classmethod
+    def is_accessible_by(cls,user):
+        return True
+
+    @classmethod
+    def accepted_for(cls,user):
+        return True
+
+
+
+class CV2B(ContentView):
+    uid = 'CV2B'
+    title = 'CV2B'
+
+    @classmethod
+    def is_accessible_by(cls,user):
+        return True
+
+    @classmethod
+    def accepted_for(cls,user):
+        return True
+
+
+class CV1C(ContentView):
+    uid = 'CV1C'
+    title = 'CV1C'
+
+    @classmethod
+    def is_accessible_by(cls,user):
+        return True
+
+    @classmethod
+    def accepted_for(cls,user):
+        return True
+
+
 class TOCifyTest(TestCase):
 
     def setUp(self):
-        self.course_structure = [('lvl3a',['lvl2a','lvl2b']),
-                                 ('lvl2a',['lvl1a','lvl1b']),
-                                 ('lvl2b',['lvl1b','lvl1c']),
-                                 ('lvl1a',[]),
-                                 ('lvl1b',[]),
-                                 ('lvl1c',[])]
+        self.course_structure = [(CV3A,[CV2A,CV2B]),
+                                 (CV2A,[CV1A,CV1B]),
+                                 (CV2B,[CV1B,CV1C]),
+                                 (CV1A,[]),
+                                 (CV1B,[]),
+                                 (CV1C,[])]
         self.inverted = invert_edges(self.course_structure)
         self.tocified = tocify(self.course_structure,self.inverted)
         self.maxDiff = None
 
     def test_invert_edges(self):
         self.assertEqual(self.inverted,
-                         [('lvl2a',['lvl3a']),
-                          ('lvl2b',['lvl3a']),
-                          ('lvl1a',['lvl2a']),
-                          ('lvl1b',['lvl2a','lvl2b']),
-                          ('lvl1c',['lvl2b'])])
+                         [(CV2A,[CV3A]),
+                          (CV2B,[CV3A]),
+                          (CV1A,[CV2A]),
+                          (CV1B,[CV2A,CV2B]),
+                          (CV1C,[CV2B])])
 
     def test_can_tocify(self):
-        self.assertEqual(self.tocified,[['lvl1a',['lvl2a',['lvl3a']]],
-                                        ['lvl1b',['lvl2a',['lvl3a']],
-                                                 ['lvl2b',['lvl3a']]],
-                                        ['lvl1c',['lvl2b',['lvl3a']]]])
+        self.assertEqual(self.tocified,[[CV1A,[CV2A,[CV3A]]],
+                                        [CV1B,[CV2A,[CV3A]],
+                                                 [CV2B,[CV3A]]],
+                                        [CV1C,[CV2B,[CV3A]]]])
 
     def test_ulify(self):
         mock_request = MagicMock()
-        outcome = ulify(self.tocified,mock_request,'mycourse')
+        # TODO: make CVXY contentview classes for purpose of testing
+        # could actually use those for preceding tests if I nest them inside test class
+        structure = [[CV1A,[CV2A,[CV3A]]],
+                     [CV1B,[CV2A,[CV3A]],
+                           [CV2B,[CV3A]]],
+                     [CV1C,[CV2B,[CV3A]]]]
+        outcome = ulify(self.tocified,mock_request,'mycourse',reverse_func = lambda x: "http://www.google.com")
         expected = '''
 <ul>
   <li>lvl1a
