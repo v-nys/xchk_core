@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from xchk_core.models import Submission, Repo
 from xchk_core.strats import *
 from xchk_core.courses import courses, tocify, invert_edges
+from xchk_core.views import ulify
 from xchk_core.templatetags.xchk_instructions import node_instructions_2_ul
 
 class TrueCheckInstructionGenerationTest(TestCase):
@@ -154,15 +155,18 @@ class RepoFormTest(TestCase):
 class TOCifyTest(TestCase):
 
     def setUp(self):
-        self.course = [('lvl3a',['lvl2a','lvl2b']),
-                       ('lvl2a',['lvl1a','lvl1b']),
-                       ('lvl2b',['lvl1b','lvl1c']),
-                       ('lvl1a',[]),
-                       ('lvl1b',[]),
-                       ('lvl1c',[])]
+        self.course_structure = [('lvl3a',['lvl2a','lvl2b']),
+                                 ('lvl2a',['lvl1a','lvl1b']),
+                                 ('lvl2b',['lvl1b','lvl1c']),
+                                 ('lvl1a',[]),
+                                 ('lvl1b',[]),
+                                 ('lvl1c',[])]
+        self.inverted = invert_edges(self.course_structure)
+        self.tocified = tocify(self.course_structure,self.inverted)
+        self.maxDiff = None
 
     def test_invert_edges(self):
-        self.assertEqual(invert_edges(self.course),
+        self.assertEqual(self.inverted,
                          [('lvl2a',['lvl3a']),
                           ('lvl2b',['lvl3a']),
                           ('lvl1a',['lvl2a']),
@@ -170,11 +174,53 @@ class TOCifyTest(TestCase):
                           ('lvl1c',['lvl2b'])])
 
     def test_can_tocify(self):
-        inverted = invert_edges(self.course)
-        tocified = tocify(self.course,inverted)
-        self.assertEqual(tocified,[['lvl1a',['lvl2a',['lvl3a']]],
-                                   ['lvl1b',['lvl2a',['lvl3a']],['lvl2b',['lvl3a']]],
-                                   ['lvl1c',['lvl2b',['lvl3a']]]])
+        self.assertEqual(self.tocified,[['lvl1a',['lvl2a',['lvl3a']]],
+                                        ['lvl1b',['lvl2a',['lvl3a']],
+                                                 ['lvl2b',['lvl3a']]],
+                                        ['lvl1c',['lvl2b',['lvl3a']]]])
+
+    def test_ulify(self):
+        mock_request = MagicMock()
+        outcome = ulify(self.tocified,mock_request,'mycourse')
+        expected = '''
+<ul>
+  <li>lvl1a
+    <ul>
+      <li>lvl2a
+        <ul>
+          <li>lvl3a</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>lvl1b
+    <ul>
+      <li>lvl2a
+        <ul>
+          <li>lvl3a</li>
+        </ul>
+      </li>
+      <li>lvl2b
+        <ul>
+          <li>lvl3a</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>lvl1c
+    <ul>
+      <li>lvl2b
+        <ul>
+          <li>lvl3a</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+'''
+        soup1 = BeautifulSoup(outcome,'html.parser')
+        soup2 = BeautifulSoup(expected,'html.parser')
+        self.assertEqual(soup1.prettify(),soup2.prettify())
 
 if __name__ == '__main__':
     unittest.main()

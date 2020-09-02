@@ -45,15 +45,6 @@ def submission_view(request,submission_pk):
 
 @login_required
 def new_course_view(request,course_title):
-    def _dependency_pair_toc_entry(dp,inverted_course):
-        dependency = dp[0]
-        dependents = dp[1]
-        # TODO: add css class indicating whether completed/reachable/...
-        # TODO: add URL
-        outcome = f'<li>{dependency.uid}<ul>'
-        outcome += ''.join([_dependency_pair_toc_entry(next_lvl,inverted_course) for next_lvl in inverted_course if next_lvl[0] in dependents])
-        outcome += '</ul></li>'
-        return outcome
     repo = None
     try:
         repo = Repo.objects.filter(user=request.user).get(course=course_title)
@@ -64,12 +55,18 @@ def new_course_view(request,course_title):
     course = courses.courses()[course_title]
     # from dependency to dependents
     inverted_course = courses.invert_edges(course.structure)
-    independent_nodes = [pair[0] for pair in course.structure if not pair[1]]
-    ul_representation = '<ul>'
-    ul_representation += ''.join([_dependency_pair_toc_entry(pair,inverted_course) for pair in filter(lambda x: x[0] in independent_nodes,inverted_course)])
-    ul_representation += '</ul>'
-    # ul_representation = ''
+    tocified = tocify(course.structure,inverted_course)
+    ul_representation = ulify(tocified,request,course_title)
     return render(request,'xchk_core/course_overview.html',{'toc':ul_representation})
+
+def ulify(tocified,request,course_title):
+    print(tocified)
+    def _entry_to_li(e):
+        output = f'<li>{e[0]}'
+        output += f'<ul>{"".join([_entry_to_li(nested) for nested in e[1:]])}</ul>' if e[1:] else ''
+        output += '</li>'
+        return output
+    return f'<ul>{"".join([_entry_to_li(entry) for entry in tocified])}</ul>'
 
 def node_feedback_view(request,node_pk):
     form = FeedbackForm(request.POST)
