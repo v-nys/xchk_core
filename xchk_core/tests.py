@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch, MagicMock
 from bs4 import BeautifulSoup
 from xchk_core.models import Submission, Repo
 from xchk_core.strats import *
+from xchk_core.courses import courses, tocify, invert_edges
 from xchk_core.templatetags.xchk_instructions import node_instructions_2_ul
 
 class TrueCheckInstructionGenerationTest(TestCase):
@@ -149,6 +150,31 @@ class RepoFormTest(TestCase):
     def test_can_import(self):
         import xchk_core.forms
         self.assertTrue(True)
+
+class TOCifyTest(TestCase):
+
+    def setUp(self):
+        self.course = [('lvl3a',['lvl2a','lvl2b']),
+                       ('lvl2a',['lvl1a','lvl1b']),
+                       ('lvl2b',['lvl1b','lvl1c']),
+                       ('lvl1a',[]),
+                       ('lvl1b',[]),
+                       ('lvl1c',[])]
+
+    def test_invert_edges(self):
+        self.assertEqual(invert_edges(self.course),
+                         [('lvl2a',['lvl3a']),
+                          ('lvl2b',['lvl3a']),
+                          ('lvl1a',['lvl2a']),
+                          ('lvl1b',['lvl2a','lvl2b']),
+                          ('lvl1c',['lvl2b'])])
+
+    def test_can_tocify(self):
+        inverted = invert_edges(self.course)
+        tocified = tocify(self.course,inverted)
+        self.assertEqual(tocified,[['lvl1a',['lvl2a',['lvl3a']]],
+                                   ['lvl1b',['lvl2a',['lvl3a']],['lvl2b',['lvl3a']]],
+                                   ['lvl1c',['lvl2b',['lvl3a']]]])
 
 if __name__ == '__main__':
     unittest.main()

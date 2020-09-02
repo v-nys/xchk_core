@@ -2,6 +2,7 @@ from . import contentviews as cv
 import importlib
 import os
 from django.conf import settings
+from iteration_utilities import first
 
 class Course:
 
@@ -29,3 +30,13 @@ def invert_edges(dependency_graph):
                 inverted.append((dependency,list_of_dependents))
             list_of_dependents.append(dependent)
     return inverted
+
+def tocify(course,inverted_course):
+    def _dependency_pair_to_lst(pair):
+        def _default_entry(dependent):
+            return first(inverted_course,default=(dependent,[]),pred=lambda x: x[0] == dependent)
+        dependents = pair[1]
+        rec = [_dependency_pair_to_lst(_default_entry(dependent)) for dependent in dependents]
+        return [pair[0]] + rec
+    independent_cvs = [x[0] for x in course if x[1] == []]
+    return [_dependency_pair_to_lst(pair) for pair in inverted_course if pair[0] in independent_cvs]

@@ -68,6 +68,7 @@ def new_course_view(request,course_title):
     ul_representation = '<ul>'
     ul_representation += ''.join([_dependency_pair_toc_entry(pair,inverted_course) for pair in filter(lambda x: x[0] in independent_nodes,inverted_course)])
     ul_representation += '</ul>'
+    # ul_representation = ''
     return render(request,'xchk_core/course_overview.html',{'toc':ul_representation})
 
 def node_feedback_view(request,node_pk):
