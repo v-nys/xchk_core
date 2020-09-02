@@ -75,8 +75,8 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
             output += f' class="{" ".join([cls for cls in classes])}"'
         output += f'>'
         output += f'<a href="{reverse_func(e[0].uid + "_view")}">'
+        output += f'{e[0].title}'
         output += '</a>'
-        output += f'{e[0]}'
         output += f'<ul>{"".join([_entry_to_li(nested) for nested in e[1:]])}</ul>' if e[1:] else ''
         output += '</li>'
         return output

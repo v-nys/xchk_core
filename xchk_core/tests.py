@@ -305,6 +305,7 @@ class TOCifyTest(TestCase):
 </ul>'''
         soup1 = BeautifulSoup(outcome,'html.parser')
         soup2 = BeautifulSoup(expected,'html.parser')
+        print(soup1.prettify())
         self.assertEqual(soup1.prettify().strip(),soup2.prettify().strip())
 
 if __name__ == '__main__':
