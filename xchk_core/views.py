@@ -72,6 +72,8 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
             classes.append('accepted')
         elif e[0].completed_by(request.user,user_submissions):
             classes.append('undecided')
+        if not e[0].is_accessible_by(request.user,user_submissions):
+            classes.append('locked')
         output = f'<li>'
         output += f'<a cv_uid="{e[0].uid}" href="{reverse_func(e[0].uid + "_view")}"'
         if classes:
@@ -81,6 +83,7 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
         output += '</a>'
         if not e[0].is_accessible_by(request.user,user_submissions):
             output += ' <i class="fas fa-lock"></i>'
+        output += f' <i class="fas fa-crosshairs" for_cv_uid="{e[0].uid}"></i>'
         if e[0] not in expanded_nodes:
             output += f'<ul>{"".join([_entry_to_li(nested,expanded_nodes,user_submissions) for nested in e[1:]])}</ul>' if e[1:] else ''
         expanded_nodes.add(e[0])
