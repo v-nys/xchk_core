@@ -272,8 +272,6 @@ class TOCifyTest(TestCase):
                            [CV2B,[CV3A]]],
                      [CV1C,[CV2B,[CV3A]]]]
         outcome = ulify(self.tocified,mock_request,'mycourse',reverse_func = lambda x: "http://www.google.com")
-        # TODO: attribute basis van UID voorzien zodat target aanduiden mogelijk is
-        # TODO: klasse toevoegen aan de globale lijst of aan alle list entries zodat target icoontje kan worden voorzien
         expected = '''
 <ul>
   <li><a class="accepted" cv_uid="CV1A" href="http://www.google.com">CV1A</a>

@@ -60,8 +60,6 @@ def new_course_view(request,course_title):
     return render(request,'xchk_core/course_overview.html',{'toc':ul_representation})
 
 def ulify(tocified,request,course_title,reverse_func=reverse):
-    # toevoegen link
-    # toevoegen target knop? kan dit laatste mss beter via CSS doen, zoals bij uitleg instructies
     def _entry_to_li(e,expanded_nodes):
         classes = []
         if e[0].accepted_for(request.user):
