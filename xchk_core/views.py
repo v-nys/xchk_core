@@ -80,7 +80,7 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
             output += f' class="{" ".join([cls for cls in classes])}"'
         output += '>'
         output += f'{e[0].title}'
-        output += '</a>'
+        output += '</a><span></span>'
         if e[0] not in expanded_nodes:
             output += f'<ul>{"".join([_entry_to_li(nested,expanded_nodes,user_submissions) for nested in e[1:]])}</ul>' if e[1:] else ''
         expanded_nodes.add(e[0])
