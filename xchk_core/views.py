@@ -55,7 +55,7 @@ def new_course_view(request,course_title):
     course = courses.courses()[course_title]
     # from dependency to dependents
     inverted_course = courses.invert_edges(course.structure)
-    tocified = tocify(course.structure,inverted_course)
+    tocified = courses.tocify(course.structure,inverted_course)
     ul_representation = ulify(tocified,request,course_title)
     return render(request,'xchk_core/course_overview.html',{'toc':ul_representation})
 
