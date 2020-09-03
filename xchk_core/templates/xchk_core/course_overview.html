@@ -27,13 +27,11 @@ markWithDependencies = function(uid) {
   }
 }
 $(window).on('load', function() {
-  $(".fa-crosshairs").hover(
+  $(".fa-crosshairs").click(
     function(e) {
       markWithDependencies($(this).attr('for_cv_uid'));
-    },
-    function(e) {
-      $("*").removeClass("dependency");
-  });
+    }
+  );
 }); 
 </script>
 {% endblock %}
