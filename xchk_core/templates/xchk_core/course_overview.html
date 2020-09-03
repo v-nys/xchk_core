@@ -17,7 +17,7 @@
 <script>
 dependencies = JSON.parse(document.getElementById('supplied_dependencies').textContent);
 markWithDependencies = function(uid) {
-  var a = $("a").filter(function() { return $(this).find('cv_uid').text() === uid });
+  var a = $("a").filter(function() { return $(this).attr('cv_uid') === uid });
   a.addClass("dependency");
   var a_dependencies = dependencies[uid];
   if (a_dependencies) {
@@ -32,7 +32,7 @@ $(window).on('load', function() {
       markWithDependencies($(this).attr('for_cv_uid'));
     },
     function(e) {
-      $("*").removeClass("dependency")
+      $("*").removeClass("dependency");
   });
 }); 
 </script>
