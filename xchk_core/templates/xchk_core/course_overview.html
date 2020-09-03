@@ -16,20 +16,20 @@
 {{ supplied_dependencies|json_script:"supplied_dependencies" }}
 <script>
 dependencies = JSON.parse(document.getElementById('supplied_dependencies').textContent);
-markWithDependencies = function(title) {
-  var node = $(".node").filter(function() { return $(this).find('title').text() === title });
-  node.addClass("dependency");
-  var node_dependencies = dependencies[title];
-  if (node_dependencies) {
-    for (dep in node_dependencies) {
-      markWithDependencies(node_dependencies[dep]);
+markWithDependencies = function(uid) {
+  var a = $("a").filter(function() { return $(this).find('cv_uid').text() === uid });
+  a.addClass("dependency");
+  var a_dependencies = dependencies[uid];
+  if (a_dependencies) {
+    for (dep in a_dependencies) {
+      markWithDependencies(a_dependencies[dep]);
     }
   }
 }
 $(window).on('load', function() {
-  $(".node").hover(
+  $(".fa-crosshairs").hover(
     function(e) {
-      markWithDependencies($(this).find('title').html());
+      markWithDependencies($(this).attr('for_cv_uid'));
     },
     function(e) {
       $("*").removeClass("dependency")
