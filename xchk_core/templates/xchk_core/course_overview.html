@@ -29,6 +29,7 @@ markWithDependencies = function(uid) {
 $(window).on('load', function() {
   $(".fa-crosshairs").click(
     function(e) {
+      $('*').removeClass('dependency');
       markWithDependencies($(this).attr('for_cv_uid'));
     }
   );
