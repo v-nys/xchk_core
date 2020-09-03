@@ -1,5 +1,6 @@
 import functools
 import inspect
+import iteration_utilities
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.views import View
@@ -26,14 +27,12 @@ class ContentView(View,LoginRequiredMixin):
 
     @classmethod
     def is_accessible_by_in(cls,user,course,user_submissions):
-        return True
-        # graph = courses.course_graphs()[course]
-        # try:
-        #     v = graph.vs.find(label=cls.uid)
-        # except ValueError:
-        #     return False
-        # preds = [e.source_vertex for e in graph.es.select(_to=v.index)]
-        # return all((p["contentview"].completed_by(user) for p in preds))
+        structure = courses.courses()[course]
+        entry = iteration_utilities.first(structure,None,lambda x: x[0] is cls)
+        if entry:
+            return all((dependency.completed_by(user,user_submissions) for dependency in entry[1]))
+        else:
+            return False
 
     @classmethod
     def completed_by(cls,user,user_submissions=None):
