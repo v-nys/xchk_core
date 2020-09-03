@@ -175,7 +175,11 @@ class CV2A(ContentView):
 
     @classmethod
     def accepted_for(cls,user):
-        return True
+        return False
+
+    @classmethod
+    def completed_by(cls,user):
+        return False
 
 
 class CV3A(ContentView):
@@ -184,13 +188,15 @@ class CV3A(ContentView):
 
     @classmethod
     def is_accessible_by(cls,user):
-        return True
+        return False
 
     @classmethod
     def accepted_for(cls,user):
-        return True
+        return False
 
-
+    @classmethod
+    def completed_by(cls,user):
+        return False
 
 class CV1B(ContentView):
     uid = 'CV1B'
@@ -204,8 +210,6 @@ class CV1B(ContentView):
     def accepted_for(cls,user):
         return True
 
-
-
 class CV2B(ContentView):
     uid = 'CV2B'
     title = 'CV2B'
@@ -216,8 +220,11 @@ class CV2B(ContentView):
 
     @classmethod
     def accepted_for(cls,user):
-        return True
+        return False
 
+    @classmethod
+    def completed_by(cls,user):
+        return True
 
 class CV1C(ContentView):
     uid = 'CV1C'
@@ -230,7 +237,6 @@ class CV1C(ContentView):
     @classmethod
     def accepted_for(cls,user):
         return True
-
 
 class TOCifyTest(TestCase):
 
@@ -272,28 +278,28 @@ class TOCifyTest(TestCase):
         # TODO: klasse toevoegen aan de globale lijst of aan alle list entries zodat target icoontje kan worden voorzien
         expected = '''
 <ul>
-  <li>lvl1a
+  <li><a class="accepted" href="http://www.google.com">CV1A</a>
     <ul>
-      <li>lvl2a
+      <li><a href="http://www.google.com">CV2A</a>
         <ul>
-          <li>lvl3a</li>
+          <li><a class="locked" href="http://www.google.com">CV3A</a></li>
         </ul>
       </li>
     </ul>
   </li>
-  <li>lvl1b
+  <li><a class="accepted" href="http://www.google.com">CV1B</a>
     <ul>
-      <li>lvl2a</li>
-      <li>lvl2b
+      <li><a href="http://www.google.com">CV2A</a></li>
+      <li><a href="http://www.google.com" class="undecided">CV2B</a>
         <ul>
-          <li>lvl3a</li>
+          <li><a href="http://www.google.com" class="locked">CV3A</a></li>
         </ul>
       </li>
     </ul>
   </li>
-  <li>lvl1c
+  <li><a class="accepted" href="http://www.google.com">CV1C</a>
     <ul>
-      <li>lvl2b</li>
+      <li><a href="http://www.google.com" class="undecided">CV2B</a></li>
     </ul>
   </li>
 </ul>'''
