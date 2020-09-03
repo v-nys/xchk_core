@@ -13,7 +13,7 @@ import re
 import requests
 import itertools
 from .forms import CheckRequestFormSet, RepoSelectionForm, FeedbackForm
-from .models import Repo, SubmissionState
+from .models import Repo, Submission, SubmissionState
 from . import courses
 from django.forms import ChoiceField
 from django.conf import settings
