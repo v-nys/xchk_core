@@ -272,40 +272,37 @@ class TOCifyTest(TestCase):
                            [CV2B,[CV3A]]],
                      [CV1C,[CV2B,[CV3A]]]]
         outcome = ulify(self.tocified,mock_request,'mycourse',reverse_func = lambda x: "http://www.google.com")
-        # TODO: verwachting al aangepast om te prunen, code nog laten doen
-        # TODO: klassen toevoegen op basis van al dan niet aanvaard (en variatie in data voorzien)
-        # TODO: klasse op basis van UID voorzien zodat target aanduiden mogelijk is
+        # TODO: attribute basis van UID voorzien zodat target aanduiden mogelijk is
         # TODO: klasse toevoegen aan de globale lijst of aan alle list entries zodat target icoontje kan worden voorzien
         expected = '''
 <ul>
-  <li><a class="accepted" href="http://www.google.com">CV1A</a>
+  <li><a class="accepted" cv_uid="CV1A" href="http://www.google.com">CV1A</a>
     <ul>
-      <li><a href="http://www.google.com">CV2A</a>
+      <li><a cv_uid="CV2A" href="http://www.google.com">CV2A</a>
         <ul>
-          <li><a class="locked" href="http://www.google.com">CV3A</a></li>
+          <li><a cv_uid="CV3A" class="locked" href="http://www.google.com">CV3A</a></li>
         </ul>
       </li>
     </ul>
   </li>
-  <li><a class="accepted" href="http://www.google.com">CV1B</a>
+  <li><a class="accepted" cv_uid="CV1B" href="http://www.google.com">CV1B</a>
     <ul>
-      <li><a href="http://www.google.com">CV2A</a></li>
-      <li><a href="http://www.google.com" class="undecided">CV2B</a>
+      <li><a cv_uid="CV2A" href="http://www.google.com">CV2A</a></li>
+      <li><a cv_uid="CV2B" href="http://www.google.com" class="undecided">CV2B</a>
         <ul>
-          <li><a href="http://www.google.com" class="locked">CV3A</a></li>
+          <li><a cv_uid="CV3A" href="http://www.google.com" class="locked">CV3A</a></li>
         </ul>
       </li>
     </ul>
   </li>
-  <li><a class="accepted" href="http://www.google.com">CV1C</a>
+  <li><a class="accepted" cv_uid="CV1C" href="http://www.google.com">CV1C</a>
     <ul>
-      <li><a href="http://www.google.com" class="undecided">CV2B</a></li>
+      <li><a cv_uid="CV2B" href="http://www.google.com" class="undecided">CV2B</a></li>
     </ul>
   </li>
 </ul>'''
         soup1 = BeautifulSoup(outcome,'html.parser')
         soup2 = BeautifulSoup(expected,'html.parser')
-        print(soup1.prettify())
         self.assertEqual(soup1.prettify().strip(),soup2.prettify().strip())
 
 if __name__ == '__main__':

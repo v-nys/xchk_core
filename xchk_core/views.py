@@ -62,7 +62,7 @@ def new_course_view(request,course_title):
 def ulify(tocified,request,course_title,reverse_func=reverse):
     # toevoegen link
     # toevoegen target knop? kan dit laatste mss beter via CSS doen, zoals bij uitleg instructies
-    def _entry_to_li(e):
+    def _entry_to_li(e,expanded_nodes):
         classes = []
         if e[0].accepted_for(request.user):
             classes.append('accepted')
@@ -70,17 +70,20 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
             classes.append('undecided')
         if not e[0].is_accessible_by(request.user):
             classes.append('locked')
-        output = f'<li'
+        output = f'<li>'
+        output += f'<a cv_uid="{e[0].uid}" href="{reverse_func(e[0].uid + "_view")}"'
         if classes:
             output += f' class="{" ".join([cls for cls in classes])}"'
-        output += f'>'
-        output += f'<a href="{reverse_func(e[0].uid + "_view")}">'
+        output += '>'
         output += f'{e[0].title}'
         output += '</a>'
-        output += f'<ul>{"".join([_entry_to_li(nested) for nested in e[1:]])}</ul>' if e[1:] else ''
+        if e[0] not in expanded_nodes:
+            output += f'<ul>{"".join([_entry_to_li(nested,expanded_nodes) for nested in e[1:]])}</ul>' if e[1:] else ''
+        expanded_nodes.add(e[0])
         output += '</li>'
         return output
-    return f'<ul>{"".join([_entry_to_li(entry) for entry in tocified])}</ul>'
+    expanded_nodes = set()
+    return f'<ul>{"".join([_entry_to_li(entry,expanded_nodes) for entry in tocified])}</ul>'
 
 def node_feedback_view(request,node_pk):
     form = FeedbackForm(request.POST)
