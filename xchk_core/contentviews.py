@@ -21,12 +21,11 @@ class ContentView(View,LoginRequiredMixin):
     title = 'aanvullen'
 
     @classmethod
-    def is_accessible_by(cls,user):
-        return True
-        # return user.is_superuser or any(cls.is_accessible_by_in(user,course) for course in courses.courses())
+    def is_accessible_by(cls,user,user_submissions=None):
+        return user.is_superuser or any(cls.is_accessible_by_in(user,course,user_submissions) for course in courses.courses())
 
     @classmethod
-    def is_accessible_by_in(cls,user,course):
+    def is_accessible_by_in(cls,user,course,user_submissions):
         return True
         # graph = courses.course_graphs()[course]
         # try:
@@ -37,13 +36,19 @@ class ContentView(View,LoginRequiredMixin):
         # return all((p["contentview"].completed_by(user) for p in preds))
 
     @classmethod
-    def completed_by(cls,user):
-        submissions = Submission.objects.filter(content_uid=cls.uid).filter(submitter=user)
+    def completed_by(cls,user,user_submissions=None):
+        if not submissions:
+            submissions = Submission.objects.filter(content_uid=cls.uid).filter(submitter=user)
+        else:
+            submissions = user_submissions.filter(content_uid=cls.uid)
         return any((submission.state in [SubmissionState.ACCEPTED,SubmissionState.UNDECIDED] for submission in submissions))
 
     @classmethod
-    def accepted_for(cls,user):
-        submissions = Submission.objects.filter(content_uid=cls.uid).filter(submitter=user)
+    def accepted_for(cls,user,user_submissions=None):
+        if not submissions:
+            submissions = Submission.objects.filter(content_uid=cls.uid).filter(submitter=user)
+        else:
+            submissions = user_submissions.filter(content_uid=cls.uid)
         return any((submission.state == SubmissionState.ACCEPTED for submission in submissions))
 
     def get(self,request,*args,**kwargs):

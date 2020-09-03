@@ -60,13 +60,19 @@ def new_course_view(request,course_title):
     return render(request,'xchk_core/course_overview.html',{'toc':ul_representation})
 
 def ulify(tocified,request,course_title,reverse_func=reverse):
-    def _entry_to_li(e,expanded_nodes):
+    def _entry_to_li(e,expanded_nodes,user_submissions):
         classes = []
-        if e[0].accepted_for(request.user):
+        # TODO: dit vraagt waarschijnlijk om héél veel database requests
+        # alternatief
+        # vraag eerst alle submissions van de user voor de cursus in kwestie, met state accepted
+        # vraag dan alle submissions met state undecided als er nog geen entry accepted is
+        # dus een of twee database queries
+        # geef die info mee aan accepted_for / completed / is_accessible_by
+        if e[0].accepted_for(request.user,user_submissions):
             classes.append('accepted')
-        elif e[0].completed_by(request.user):
+        elif e[0].completed_by(request.user,user_submissions):
             classes.append('undecided')
-        if not e[0].is_accessible_by(request.user):
+        if not e[0].is_accessible_by(request.user,user_submissions):
             classes.append('locked')
         output = f'<li>'
         output += f'<a cv_uid="{e[0].uid}" href="{reverse_func(e[0].uid + "_view")}"'
@@ -80,8 +86,11 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
         expanded_nodes.add(e[0])
         output += '</li>'
         return output
+    # get all user submissions here to avoid hitting DB too hard
+    # could restrict to accepted or undecided ones if performance is unsatisfactory
+    user_submissions = Submission.objects.filter(submitter=request.user)
     expanded_nodes = set()
-    return f'<ul>{"".join([_entry_to_li(entry,expanded_nodes) for entry in tocified])}</ul>'
+    return f'<ul>{"".join([_entry_to_li(entry,expanded_nodes,user_submissions) for entry in tocified])}</ul>'
 
 def node_feedback_view(request,node_pk):
     form = FeedbackForm(request.POST)
