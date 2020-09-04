@@ -14,12 +14,12 @@ $(window).on('load', function() {
   const data = JSON.parse(document.getElementById('graph').textContent);
   var graph = new Springy.Graph();
   var nodes = {}
-  for (dependency_pair in data) {
-    nodes[data[dependency_pair][0]] = graph.newNode({ label : data[dependency_pair][0]});
+  for (dependency_pair_idx in data) {
+    nodes[data[dependency_pair_idx][0]] = graph.newNode({ label : data[dependency_pair_idx][0]});
   }
-  for (dependency_pair in data) {
-    for (dependency in data[dependency_pair][1]) {
-      graph.newEdge(dependency,data[dependency_pair][0]);
+  for (dependency_pair_idx in data) {
+    for (dependency_idx in data[dependency_pair_idx][1]) {
+      graph.newEdge(data[dependency_pair_idx][0],data[dependency_pair_idx][1][dependency_idx]);
     }
   }
   jQuery(function(){
