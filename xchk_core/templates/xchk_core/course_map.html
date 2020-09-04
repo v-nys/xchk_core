@@ -15,7 +15,7 @@ $(window).on('load', function() {
   var graph = new Springy.Graph();
   var nodes = {}
   for (dependent in data) {
-    nodes[data[dependent]][0] = graph.newNode({ label : data[dependent]});
+    nodes[data[dependent][0]] = graph.newNode({ label : data[dependent]});
   }
   for (dependent in data) {
     for (dependency in data[dependent][1]) {
