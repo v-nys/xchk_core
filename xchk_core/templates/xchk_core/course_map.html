@@ -16,10 +16,13 @@ $(window).on('load', function() {
   var nodes = {}
   for (dependency_pair_idx in data) {
     nodes[data[dependency_pair_idx][0]] = graph.newNode({ label : data[dependency_pair_idx][0]});
+    for (dependency_idx in data[dependency_pair_idx][1]) {
+      nodes[data[dependency_pair_idx][1][dependency_idx]] = graph.newNode({ label : data[dependency_pair_idx][1][dependency_idx] });
+    }
   }
   for (dependency_pair_idx in data) {
     for (dependency_idx in data[dependency_pair_idx][1]) {
-      graph.newEdge(data[dependency_pair_idx][0],data[dependency_pair_idx][1][dependency_idx]);
+      graph.newEdge(nodes[data[dependency_pair_idx][1][dependency_idx]],nodes[data[dependency_pair_idx][0]]);
     }
   }
   jQuery(function(){
