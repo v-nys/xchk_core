@@ -15,11 +15,11 @@ $(window).on('load', function() {
   var graph = new Springy.Graph();
   var nodes = {}
   for (dependency_pair_idx in data) {
-    if (data[dependency_pair_idx][0] not in nodes) {
+    if (!(data[dependency_pair_idx][0] in nodes)) {
       nodes[data[dependency_pair_idx][0]] = graph.newNode({ label : data[dependency_pair_idx][0]});
     }
     for (dependency_idx in data[dependency_pair_idx][1]) {
-      if (data[dependency_pair_idx][1][dependency_idx] not in nodes) {
+      if (!(data[dependency_pair_idx][1][dependency_idx] in nodes)) {
         nodes[data[dependency_pair_idx][1][dependency_idx]] = graph.newNode({ label : data[dependency_pair_idx][1][dependency_idx] });
       }
     }
