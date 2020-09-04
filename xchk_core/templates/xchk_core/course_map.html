@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<canvas id="springydemo" width="1500px" height="1000px"/>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script src="{% static 'xchk_core/js/springy.js' %}"></script>
+<script src="{% static 'xchk_core/js/springyui.js' %}"></script>
+{{ graph|json_script:"graph" }}
+<script>
+$(window).on('load', function() {
+  const data = JSON.parse(document.getElementById('graph').textContent);
+  var graph = new Springy.Graph();
+  var nodes = {}
+  for (dependent in data) {
+    nodes[dependent] = graph.newNode({{ label: dependent}});
+  }
+  for (dependent in data) {
+    for (dependency in data[dependent]) {
+      graph.newEdge(dependency,dependent);
+    }
+  }
+  jQuery(function(){
+    var springy = window.springy = jQuery('#springydemo').springy({
+      graph: graph,
+    });
+  });
+}); 
+</script>
+{% endblock %}
