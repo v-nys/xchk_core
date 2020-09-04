@@ -60,16 +60,7 @@ def new_course_view(request,course_title):
     dependencies = {k.uid : [v.uid for v in vs] for (k,vs) in course.structure}
     return render(request,'xchk_core/course_overview.html',{'toc':ul_representation,'supplied_dependencies':dependencies})
 
-#def notes_data_to_springy(notes_data):
-#    output = ''
-#    for nd in notes_data:
-#        output += f'''var {nd.cv_class} = graph.newNode({{label: '{nd.cv_class[:-4]}'}});\n'''
-#    for nd in notes_data:
-#        for dependency in nd.dependencies:
-#            output += f'''graph.newEdge({dependency},{nd.cv_class});\n'''
-#    return output
-
-def course_map_view(course_title):
+def course_map_view(request,course_title):
     structure = courses.courses()[course_title].structure
     return render(request,'xchk_core/course_map.html',{'graph':json.dumps(structure)})
 
