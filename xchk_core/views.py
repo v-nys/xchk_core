@@ -106,7 +106,7 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
         if not e[0].is_accessible_by(request.user,user_submissions):
             output += ' <i class="fas fa-lock"></i>'
         output += f' <i class="fas fa-crosshairs" for_cv_uid="{e[0].uid}"></i>'
-        output += f' <a href="{reverse_func("course_local_map_view",args=[course_title,e[0].uid])}"><i class="fas fa-directions"></i></a>'
+        output += f' <a href="{reverse_func("checkerapp:course_local_map_view",args=[course_title,e[0].uid])}"><i class="fas fa-directions"></i></a>'
         if e[0] not in expanded_nodes:
             output += f'<ul>{"".join([_entry_to_li(nested,expanded_nodes,user_submissions) for nested in e[1:]])}</ul>' if e[1:] else ''
         expanded_nodes.add(e[0])
