@@ -74,8 +74,10 @@ def course_local_map_view(request,course_title,uid):
         previous_fixpoint_val = set(fixpoint)
         for (dependent,dependencies) in structure:
             if dependent.uid in fixpoint:
+                print(f'dependent {dependent.uid} is in fixpoint, adding dependencies')
                 for dependency in dependencies:
                     fixpoint.add(dependency.uid)
+    print(f'fixpoint: {fixpoint}')
     substructure = [(dependent.title,[dependency.title for dependency in dependencies]) for (dependent, dependencies) in structure if dependent.uid in fixpoint]
     return render(request,'xchk_core/course_map.html',{'graph':substructure})
 
