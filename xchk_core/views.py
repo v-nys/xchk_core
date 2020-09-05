@@ -62,7 +62,7 @@ def new_course_view(request,course_title):
 
 def course_map_view(request,course_title):
     structure = courses.courses()[course_title].structure
-    id_structure = [(dependent.uid,[dependency.uid for dependency in dependencies]) for (dependent, dependencies) in structure]
+    id_structure = [(dependent.title,[dependency.title for dependency in dependencies]) for (dependent, dependencies) in structure]
     # no need for json.dumps: template takes care of serialization as json-formatted string
     return render(request,'xchk_core/course_map.html',{'graph':id_structure})
 
