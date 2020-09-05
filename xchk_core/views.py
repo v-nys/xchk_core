@@ -66,6 +66,19 @@ def course_map_view(request,course_title):
     # no need for json.dumps: template takes care of serialization as json-formatted string
     return render(request,'xchk_core/course_map.html',{'graph':id_structure})
 
+def course_local_map_view(request,course_title,uid):
+    structure = courses.courses()[course_title].structure
+    previous_fixpoint_val = None
+    fixpoint = set(uid)
+    while previous_fixpoint_val != fixpoint:
+        previous_fixpoint_val = set(fixpoint)
+        for (dependent,dependencies) in structure:
+            if dependent.uid in fixpoint:
+                for dependency in dependencies:
+                    fixpoint.add(dependency.uid)
+    substructure = [(dependent.title,[dependency.title for dependency in dependencies]) for (dependent, dependencies) in structure if dependent.uid in fixpoint]
+    return render(request,'xchk_core/course_map.html',{'graph':substructure})
+
 def ulify(tocified,request,course_title,reverse_func=reverse):
     def _entry_to_li(e,expanded_nodes,user_submissions):
         classes = []
