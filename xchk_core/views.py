@@ -69,7 +69,7 @@ def course_map_view(request,course_title):
 def course_local_map_view(request,course_title,uid):
     structure = courses.courses()[course_title].structure
     previous_fixpoint_val = None
-    fixpoint = set(uid)
+    fixpoint = {uid}
     while previous_fixpoint_val != fixpoint:
         previous_fixpoint_val = set(fixpoint)
         for (dependent,dependencies) in structure:
