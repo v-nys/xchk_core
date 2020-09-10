@@ -26,7 +26,7 @@ class ContentView(View,LoginRequiredMixin):
         return user.is_superuser or any(cls.is_accessible_by_in(user,course,user_submissions) for course in courses.courses())
 
     @classmethod
-    def is_accessible_by_in(cls,user,course,user_submissions):
+    def is_accessible_by_in(cls,user,course,user_submissions=None):
         structure = courses.courses()[course].structure
         entry = iteration_utilities.first(structure,None,lambda x: x[0] is cls)
         if entry:
@@ -39,7 +39,8 @@ class ContentView(View,LoginRequiredMixin):
         if not user_submissions:
             submissions = Submission.objects.filter(content_uid=cls.uid).filter(submitter=user)
         else:
-            submissions = user_submissions.filter(content_uid=cls.uid)
+            # if it is supplied, it should be a normal iterable
+            submissions = filter(lambda x: x.content_uid == cls.uid, user_submissions)
         return any((submission.state in [SubmissionState.ACCEPTED,SubmissionState.UNDECIDED] for submission in submissions))
 
     @classmethod
@@ -47,7 +48,7 @@ class ContentView(View,LoginRequiredMixin):
         if not user_submissions:
             submissions = Submission.objects.filter(content_uid=cls.uid).filter(submitter=user)
         else:
-            submissions = user_submissions.filter(content_uid=cls.uid)
+            submissions = filter(lambda x: x.content_uid == cls.uid, user_submissions)
         return any((submission.state == SubmissionState.ACCEPTED for submission in submissions))
 
     def get(self,request,*args,**kwargs):
