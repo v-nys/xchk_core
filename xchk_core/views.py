@@ -113,8 +113,8 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
         output += '</li>'
         return output
     # get all user submissions here to avoid hitting DB too hard
-    # could restrict to accepted or undecided ones if performance is unsatisfactory
-    user_submissions = Submission.objects.filter(submitter=request.user)
+    # need to convert to list so query is not run every time!
+    user_submissions = list(Submission.objects.filter(submitter=request.user)) # derde query, is oké
     expanded_nodes = set()
     return f'<ul>{"".join([_entry_to_li(entry,expanded_nodes,user_submissions) for entry in tocified])}</ul>'
 
