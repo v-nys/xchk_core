@@ -108,6 +108,7 @@ jQuery.fn.springy = function(params) {
 	});
 
 	jQuery(canvas).click(function(e) {
+		console.log('klikklik op canvas')
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		selected = layout.nearest(p);
