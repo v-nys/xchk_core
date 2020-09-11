@@ -27,10 +27,11 @@ class ContentView(View,LoginRequiredMixin):
 
     @classmethod
     def is_accessible_by_in(cls,user,course,user_submissions=None):
-        structure = courses.courses()[course].structure
+        course_object = courses.courses()[course]
+        structure = course_object.structure
         entry = iteration_utilities.first(structure,None,lambda x: x[0] is cls)
         if entry:
-            return all((dependency.completed_by(user,user_submissions) for dependency in entry[1]))
+            return all((dependency.completed_by(user,user_submissions) for dependency in course_object.predecessors(cls)))
         else:
             return False
 

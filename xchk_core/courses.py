@@ -11,6 +11,20 @@ class Course:
         self.description = desc
         self.structure = structure
 
+    def predecessors(self,cv):
+        # could be optimized, but computation should be small enough
+        def _predecessors(cvs,inverted_structure):
+            num = len(cvs)
+            for cv in cvs:
+                direct_predecessors = first(inverted_structure,default=(cv,[]),pred=lambda x: x[0] == dependent)[1]
+                for dp in direct_predecessors:
+                    cvs.add(dp)
+            if len(cvs) == num:
+                return cvs
+            else:
+                return _predecessors(cvs,inverted_structure)
+        return _predecessors(set(cv),invert_edges(self.structure))
+
 def courses():
     course_dict = {}
     for (k,v) in settings.XCHK_SOURCE_COURSES.items():
