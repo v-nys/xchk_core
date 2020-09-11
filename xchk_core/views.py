@@ -79,7 +79,7 @@ def course_local_map_view(request,course_title,uid):
                 for dependency in dependencies:
                     fixpoint.add(dependency.uid)
     # TODO: add level of acceptance and whether node is locked
-    substructure = [({'title' : dependent.title, 'url' : reverse(dependent.uid + "_view")},[dependency.title for dependency in dependencies]) for (dependent, dependencies) in structure if dependent.uid in fixpoint]
+    substructure = [({'title' : dependent.title, 'url' : reverse(dependent.uid + "_view")},[{'title':dependency.title, 'url' : reverse(dependency.uid + "_view")} for dependency in dependencies]) for (dependent, dependencies) in structure if dependent.uid in fixpoint]
     return render(request,'xchk_core/course_map.html',{'graph':substructure})
 
 def ulify(tocified,request,course_title,reverse_func=reverse):

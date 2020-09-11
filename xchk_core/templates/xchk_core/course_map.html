@@ -24,8 +24,8 @@ $(window).on('load', function() {
     }
     for (dependency_idx in data[dependency_pair_idx][1]) {
       var dependency = data[dependency_pair_idx][1][dependency_idx]
-      if (!(dependency in nodes)) {
-        nodes[dependency] = graph.newNode({ label : dependency });
+      if (!(dependency.title in nodes)) {
+        nodes[dependency.title] = graph.newNode({ label : dependency.title, url : 'http://www.ubuntu.com' });
       }
     }
   }
