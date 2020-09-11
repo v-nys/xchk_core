@@ -67,9 +67,7 @@ def course_map_view(request,course_title):
     return render(request,'xchk_core/course_map.html',{'graph':id_structure})
 
 def course_local_map_view(request,course_title,uid):
-    # only consider relevant submissions
-    # don't filter on course! node may occur in several courses
-    user_submissions = list(Submission.objects.filter(submitter=request.user).filter(state!=SubmissionState.REFUSED).filter(state!=SubmissionState.QUEUED))
+    user_submissions = list(Submission.objects.filter(submitter=request.user))
     structure = courses.courses()[course_title].structure
     previous_fixpoint_val = None
     # TODO: can make use of course.predecessors instead?
@@ -118,7 +116,7 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
     # get all user submissions here to avoid hitting DB too hard
     # need to convert to list so query is not run every time!
     # filter out states which won't even provide benefit of the doubt
-    user_submissions = list(Submission.objects.filter(submitter=request.user).filter(state!=SubmissionState.REFUSED).filter(state!=SubmissionState.QUEUED))
+    user_submissions = list(Submission.objects.filter(submitter=request.user))
     expanded_nodes = set()
     return f'<ul>{"".join([_entry_to_li(entry,expanded_nodes,user_submissions) for entry in tocified])}</ul>'
 
