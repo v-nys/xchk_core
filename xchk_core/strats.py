@@ -138,6 +138,21 @@ class ConjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {not desired_outcome} leveren, leverde {not exit_code}"
         return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,rendered_data=f"<p>{error_msg}</p>" if exit_code != desired_outcome else None,acceptable_to_ancestor=exit_code == desired_outcome or ancestor_has_alternatives)] + analysis_children)
 
+class ImplicitConjunctiveCheck(CheckingPredicate):
+
+    def __init__(self,conjuncts):
+        self.conjuncts = conjuncts
+
+    def instructions(self,exercise_name):
+        return ConjunctiveCheck(self.conjuncts).instructions(exercise_name)
+
+    def negative_instructions(self,exercise_name):
+        return ConjunctiveCheck(self.conjuncts).negative_instructions(exercise_name)
+
+    def check_submission(self,submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation=False,open=open):
+        explicit_check = ConjunctiveCheck(self.conjuncts).check_submission(submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation,open)
+        return explicit_check
+
 class FileExistsCheck(CheckingPredicate):
 
     def __init__(self,name=None,extension=None):
