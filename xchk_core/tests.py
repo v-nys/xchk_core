@@ -149,48 +149,82 @@ class Instructions2HtmlTest(TestCase):
 
 class MoreSpecificSituationsCheckTest(TestCase):
 
-    def test_instructions_two_flat_checks_one_implicit(self):
-        less_specific = Negation(TrueCheck())
-        more_specific = TrueCheck()
-        compound = MoreSpecificSituationsCheck([less_specific,more_specific])
-        self.assertTrue(compound.instructions('someex'),["True"])
+    def setUp(self):
+        self.more_specific = ConjunctiveCheck([FileExistsCheck('file1'),FileExistsCheck('file2')])
+        self.less_specific = FileExistsCheck('file1')
+        self.compound = MoreSpecificSituationsCheck([self.more_specific,self.less_specific])
 
-    def test_negative_instructions_two_flat_checks_one_implicit(self):
-        less_specific = Negation(TrueCheck())
-        more_specific = TrueCheck()
-        compound = MoreSpecificSituationsCheck([less_specific,more_specific])
-        self.assertTrue(compound.instructions('someex'),["False"])
+    def test_instructions(self):
+        self.assertEqual(self.compound.instructions('someex'),["Je hebt een bestand met de naam file1"])
 
-    def test_checked_submission_two_flat_checks_one_implicit(self):
+    def test_negative_instructions(self):
+        self.assertEqual(self.compound.negative_instructions('someex'),["Je hebt geen bestand met de naam file1"])
+
+    def test_check_desiring_true_non_negated_globally_true(self):
+        # file1 check should pass
+        # file2 check should fail
+        # if it fails, the less specific second one will still pass
+        # so the analysis should not mention the check for file2
         self.assertTrue(False)
 
-    def test_checked_submission_two_flat_checks_one_implicit_parent_is_negation(self):
+    def test_check_desiring_true_non_negated_globally_false(self):
         self.assertTrue(False)
 
-    def test_checked_submission_two_checks_explicit_compound(self):
+    def test_check_desiring_true_negated_globally_true(self):
         self.assertTrue(False)
 
-    def test_checked_submission_two_checks_explicit_compound_parent_is_negation(self):
+    def test_check_desiring_true_negated_globally_false(self):
+        self.assertTrue(False)
+
+    def test_check_desiring_false_non_negated_globally_true(self):
+        self.assertTrue(False)
+
+    def test_check_desiring_false_non_negated_globally_false(self):
+        self.assertTrue(False)
+
+    def test_check_desiring_false_negated_globally_true(self):
+        self.assertTrue(False)
+
+    def test_check_desiring_false_negated_globally_false(self):
         self.assertTrue(False)
 
 class CatchallCheckTest(TestCase):
 
-    def test_formatted_instructions(self):
+    def setUp(self):
+        self.component1 = FileExistsCheck('file1')
+        self.component2 = FileExistsCheck('file2')
+        self.compound = CatchallCheck([self.component1, self.component2],
+                                      'Je hebt alle files die vermeld worden in de opgave',
+                                      'Je hebt minstens een file die vermeld wordt in de opgave niet')
+
+    def test_instructions(self):
+        self.assertEqual(self.compound.instructions('someex'),["Je hebt alle files die vermeld worden in de opgave"])
+
+    def test_negative_instructions(self):
+        self.assertEqual(self.compound.negative_instructions('someex'),["Je hebt minstens een file die vermeld wordt in de opgave niet"])
+
+    def test_check_desiring_true_non_negated_globally_true(self):
         self.assertTrue(False)
 
-    def test_formatted_negative_instructions(self):
+    def test_check_desiring_true_non_negated_globally_false(self):
         self.assertTrue(False)
 
-    def test_failed_first_component(self):
+    def test_check_desiring_true_negated_globally_true(self):
         self.assertTrue(False)
 
-    def test_failed_second_component(self):
+    def test_check_desiring_true_negated_globally_false(self):
         self.assertTrue(False)
 
-    def test_failed_last_component(self):
+    def test_check_desiring_false_non_negated_globally_true(self):
         self.assertTrue(False)
 
-    def test_only_successful_components(self):
+    def test_check_desiring_false_non_negated_globally_false(self):
+        self.assertTrue(False)
+
+    def test_check_desiring_false_negated_globally_true(self):
+        self.assertTrue(False)
+
+    def test_check_desiring_false_negated_globally_false(self):
         self.assertTrue(False)
 
 class RepoFormTest(TestCase):

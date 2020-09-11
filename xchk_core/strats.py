@@ -140,13 +140,15 @@ class ConjunctiveCheck(CheckingPredicate):
 
 class MoreSpecificSituationsCheck(CheckingPredicate):
     """A disjunction in which success in any disjunct strictly implies success in the last disjunct.
-
+    
     This type of check allows for better feedback.
     For instance, if a predetermined answer is expected, any other answer is wrong.
     However, some other answers may be common mistakes, whereas others could be one-offs.
     Even though the last disjunct would refuse common mistakes and one-offs, more specific component checks can be used to provide more accurate feedback for the common mistakes.
 
     It is up to the user of this class to guarantee that success in any disjunct implies success in the last disjunct."""
+
+    # TODO: eigenlijk is de naam hier niet goed
 
     def __init__(self,disjuncts):
         self.disjuncts = disjuncts
