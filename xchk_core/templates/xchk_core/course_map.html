@@ -40,7 +40,7 @@ $(window).on('load', function() {
     var springy = window.springy = jQuery('#springydemo').springy({
       graph: graph,
       nodeSelected: function(node) {
-        console.log('Should visit ' + node.data.url);
+        window.location.href = node.data.url
       }
     });
   });
