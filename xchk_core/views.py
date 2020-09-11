@@ -82,20 +82,14 @@ def course_local_map_view(request,course_title,uid):
     substructure = [({'title' : dependent.title, 'url' : reverse(dependent.uid + "_view"), 'locked' : not dependent.is_accessible_by(request.user,user_submissions)},[{'title':dependency.title, 'url' : reverse(dependency.uid + "_view"), 'locked': not dependency.is_accessible_by(request.user,user_submissions)} for dependency in dependencies]) for (dependent, dependencies) in structure if dependent.uid in fixpoint]
     return render(request,'xchk_core/course_map.html',{'graph':substructure})
 
-def ulify(tocified,request,course_title,reverse_func=reverse):
+def ulify(tocified,request,course_title,reverse_func=reverse,user_submissions=None):
     def _entry_to_li(e,expanded_nodes,user_submissions):
         classes = []
-        # TODO: dit vraagt waarschijnlijk om héél veel database requests
-        # alternatief
-        # vraag eerst alle submissions van de user voor de cursus in kwestie, met state accepted
-        # vraag dan alle submissions met state undecided als er nog geen entry accepted is
-        # dus een of twee database queries
-        # geef die info mee aan accepted_for / completed / is_accessible_by
-        if e[0].accepted_for(request.user,user_submissions):
+        if e[0].accepted_for(request.user,user_submissions=user_submissions):
             classes.append('accepted')
-        elif e[0].completed_by(request.user,user_submissions):
+        elif e[0].completed_by(request.user,user_submissions=user_submissions):
             classes.append('undecided')
-        if not e[0].is_accessible_by(request.user,user_submissions):
+        if not e[0].is_accessible_by(request.user,user_submissions=user_submissions):
             classes.append('locked')
         output = f'<li>'
         output += f'<a cv_uid="{e[0].uid}" href="{reverse_func(e[0].uid + "_view")}"'
@@ -104,7 +98,7 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
         output += '>'
         output += f'{e[0].title}'
         output += '</a>'
-        if not e[0].is_accessible_by(request.user,user_submissions):
+        if not e[0].is_accessible_by(request.user,user_submissions=user_submissions):
             output += ' <i class="fas fa-lock"></i>'
         output += f' <i class="fas fa-crosshairs" for_cv_uid="{e[0].uid}"></i>'
         output += f' <a href="{reverse_func("checkerapp:course_local_map_view",args=[course_title,e[0].uid])}"><i class="fas fa-directions"></i></a>'
@@ -116,7 +110,8 @@ def ulify(tocified,request,course_title,reverse_func=reverse):
     # get all user submissions here to avoid hitting DB too hard
     # need to convert to list so query is not run every time!
     # filter out states which won't even provide benefit of the doubt
-    user_submissions = list(Submission.objects.filter(submitter=request.user))
+    if user_submissions is None:
+        user_submissions = list(Submission.objects.filter(submitter=request.user))
     expanded_nodes = set()
     return f'<ul>{"".join([_entry_to_li(entry,expanded_nodes,user_submissions) for entry in tocified])}</ul>'
 

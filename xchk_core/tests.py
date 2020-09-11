@@ -150,10 +150,7 @@ class Instructions2HtmlTest(TestCase):
 class ImplicitConjunctiveCheckTest(TestCase):
 
     def test_instructions_two_flat_checks_one_implicit(self):
-        subchk1 = TrueCheck()
-        subchk2 = FileExistsCheck()
-        chk = ImplicitConjunctiveCheck([subchk1,subchk2])
-        self.assertEqual(chk.instructions('someex'),["Je hebt een bestand met naam someex"])
+        self.assertTrue(False)
 
     def test_negative_instructions_two_flat_checks_one_implicit(self):
         self.assertTrue(False)
@@ -300,7 +297,7 @@ class TOCifyTest(TestCase):
                      [CV1B,[CV2A,[CV3A]],
                            [CV2B,[CV3A]]],
                      [CV1C,[CV2B,[CV3A]]]]
-        outcome = ulify(self.tocified,mock_request,'mycourse',reverse_func = lambda x: "http://www.google.com")
+        outcome = ulify(self.tocified,mock_request,'mycourse',reverse_func = lambda x: "http://www.google.com",user_submissions=[])
         expected = '''
 <ul>
   <li><a class="accepted" cv_uid="CV1A" href="http://www.google.com">CV1A</a>

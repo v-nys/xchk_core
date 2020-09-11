@@ -140,11 +140,12 @@ class ConjunctiveCheck(CheckingPredicate):
 
 class ImplicitConjunctiveCheck(CheckingPredicate):
 
-    def __init__(self,conjuncts):
+    def __init__(self,conjuncts,kernel):
         self.conjuncts = conjuncts
+        self.kernel=kernel
 
     def instructions(self,exercise_name):
-        return ConjunctiveCheck(self.conjuncts).instructions(exercise_name)
+        return self.kernel.instructions(exercise_name)
 
     def negative_instructions(self,exercise_name):
         return ConjunctiveCheck(self.conjuncts).negative_instructions(exercise_name)
