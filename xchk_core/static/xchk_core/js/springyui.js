@@ -113,15 +113,10 @@ jQuery.fn.springy = function(params) {
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		selected = layout.nearest(p);
-		node = selected.node;
-		if (node && node.data && node.data.onclick) {
-			console.log('klikklik');
-			//node.data.onclick();
-		}
 	});
 
 	jQuery(canvas).mouseup(function(e) {
-		if (new Date().getTime() < (clicktimer + 200)) {
+		if (new Date().getTime() < (clicktimer + 500)) {
 		    node = selected.node;
 		    if (node && node.data && node.data.onclick) {
 		    	console.log('klikklik');
