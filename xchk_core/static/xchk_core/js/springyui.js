@@ -113,6 +113,7 @@ jQuery.fn.springy = function(params) {
 		selected = layout.nearest(p);
 		node = selected.node;
 		if (node && node.data && node.data.click) {
+			console.log('klikklik');
 			node.data.onclick();
 		}
 	});
