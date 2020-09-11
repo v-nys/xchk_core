@@ -138,17 +138,46 @@ class ConjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {not desired_outcome} leveren, leverde {not exit_code}"
         return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,rendered_data=f"<p>{error_msg}</p>" if exit_code != desired_outcome else None,acceptable_to_ancestor=exit_code == desired_outcome or ancestor_has_alternatives)] + analysis_children)
 
-class ImplicitConjunctiveCheck(CheckingPredicate):
+class MoreSpecificSituationsCheck(CheckingPredicate):
+    """A disjunction in which success in any disjunct strictly implies success in the last disjunct.
 
-    def __init__(self,conjuncts,kernel):
-        self.conjuncts = conjuncts
-        self.kernel=kernel
+    This type of check allows for better feedback.
+    For instance, if a predetermined answer is expected, any other answer is wrong.
+    However, some other answers may be common mistakes, whereas others could be one-offs.
+    Even though the last disjunct would refuse common mistakes and one-offs, more specific component checks can be used to provide more accurate feedback for the common mistakes.
+
+    It is up to the user of this class to guarantee that success in any disjunct implies success in the last disjunct."""
+
+    def __init__(self,disjuncts):
+        self.disjuncts = disjuncts
 
     def instructions(self,exercise_name):
-        return self.kernel.instructions(exercise_name)
+        return self.disjuncts[-1].instructions(exercise_name)
 
     def negative_instructions(self,exercise_name):
-        return ConjunctiveCheck(self.conjuncts).negative_instructions(exercise_name)
+        return self.disjuncts[-1].negative_instructions(exercise_name)
+
+    def check_submission(self,submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation=False,open=open):
+        explicit_check = DisjunctiveCheck(self.disjuncts).check_submission(submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation,open)
+        return explicit_check
+
+class CatchallCheck(CheckingPredicate):
+    """A conjunction with one catchall instruction.
+
+    This type of check allows necessary, but verbose component checks to be hidden from view.
+    For instance, checks for coding guidelines.
+    Students may be expected to stick to a certain subset of the solution language, which can be checked using a conjunction: the solution has to be right and it should respect guideline A and guideline B and guideline C,...
+    A catchall description can cover all the guidelines and providing feedback on a catchall description still makes sense.
+    """
+
+    def __init__(self,conjuncts,single_instruction,single_negative_instruction):
+        self.conjuncts = conjuncts
+
+    def instructions(self,exercise_name):
+        return [single_instruction.format(exercise_name=exercise_name)]
+
+    def negative_instructions(self,exercise_name):
+        return [single_negative_instruction.format(exercise_name=exercise_name)]
 
     def check_submission(self,submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation=False,open=open):
         explicit_check = ConjunctiveCheck(self.conjuncts).check_submission(submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation,open)
