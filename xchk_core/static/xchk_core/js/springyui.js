@@ -107,9 +107,9 @@ jQuery.fn.springy = function(params) {
 		}
 	});
 
-	jQuery(canvas).click(function(e) {
-		console.log('klikklik op canvas')
-		console.log(e)
+	var clicktimer = 0;
+
+	jQuery(canvas).mousedown(function(e) {
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		selected = layout.nearest(p);
@@ -119,6 +119,17 @@ jQuery.fn.springy = function(params) {
 			//node.data.onclick();
 		}
 	});
+
+	jQuery(canvas).mouseup(function(e) {
+		if (new Date().getTime() < (clicktimer + 200)) {
+		    node = selected.node;
+		    if (node && node.data && node.data.onclick) {
+		    	console.log('klikklik');
+		    	//node.data.onclick();
+		    }
+		}
+	});
+
 
 	jQuery(canvas).mousemove(function(e) {
 		var pos = jQuery(this).offset();
