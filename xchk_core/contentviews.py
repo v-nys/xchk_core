@@ -31,7 +31,7 @@ class ContentView(View,LoginRequiredMixin):
         structure = course_object.structure
         entry = iteration_utilities.first(structure,None,lambda x: x[0] is cls)
         if entry:
-            return all((dependency.completed_by(user,user_submissions) for dependency in course_object.predecessors()))
+            return all((dependency.completed_by(user,user_submissions) for dependency in course_object.predecessors(cls)))
         else:
             return False
 
