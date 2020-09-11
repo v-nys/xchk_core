@@ -20,12 +20,12 @@ $(window).on('load', function() {
   for (dependency_pair_idx in data) {
     var dependent = data[dependency_pair_idx][0]
     if (!(dependent.title in nodes)) {
-      nodes[dependent.title] = graph.newNode({ label : dependent.title, url : 'http://www.google.be'});
+	    nodes[dependent.title] = graph.newNode({ label : dependent.title, onclick : function() {window.location.href = 'http://www.google.be'}});
     }
     for (dependency_idx in data[dependency_pair_idx][1]) {
       var dependency = data[dependency_pair_idx][1][dependency_idx]
       if (!(dependency.title in nodes)) {
-        nodes[dependency.title] = graph.newNode({ label : dependency.title, url : 'http://www.ubuntu.com' });
+	      nodes[dependency.title] = graph.newNode({ label : dependency.title, onclick : function() {window.location.href = 'http://www.ubuntu.com'} });
       }
     }
   }

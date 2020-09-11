@@ -107,6 +107,16 @@ jQuery.fn.springy = function(params) {
 		}
 	});
 
+	jQuery(canvas).click(function(e) {
+		var pos = jQuery(this).offset();
+		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
+		selected = layout.nearest(p);
+		node = selected.node;
+		if (node && node.data && node.data.click) {
+			node.data.onclick();
+		}
+	});
+
 	jQuery(canvas).mousemove(function(e) {
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
