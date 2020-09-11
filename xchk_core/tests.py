@@ -147,10 +147,13 @@ class Instructions2HtmlTest(TestCase):
         soup2 = BeautifulSoup(intended,'html.parser')
         self.assertEqual(soup1.prettify(),soup2.prettify())
 
-class ImplicitConjunctionTest(TestCase):
+class ImplicitConjunctiveCheckTest(TestCase):
 
     def test_instructions_two_flat_checks_one_implicit(self):
-        self.assertTrue(False)
+        subchk1 = TrueCheck()
+        subchk2 = FileExistsCheck()
+        chk = ImplicitConjunctiveCheck([subchk1,subchk2])
+        self.assertEqual(chk.instructions('someex'),["Je hebt een bestand met naam someex"])
 
     def test_negative_instructions_two_flat_checks_one_implicit(self):
         self.assertTrue(False)
