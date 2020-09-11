@@ -16,13 +16,16 @@ $(window).on('load', function() {
   var nodes = {}
   // dependency pair: object and a list of strings (node UID's)
   // object has title field and URL field
+  // first make node objects for all dependents and their dependencies
   for (dependency_pair_idx in data) {
-    if (!(data[dependency_pair_idx][0].title in nodes)) {
-      nodes[data[dependency_pair_idx][0].title] = graph.newNode({ label : data[dependency_pair_idx][0].title});
+    var dependent = data[dependency_pair_idx][0]
+    if (!(dependent.title in nodes)) {
+      nodes[dependent.title] = graph.newNode({ label : dependent.title, url : 'http://www.google.be'});
     }
     for (dependency_idx in data[dependency_pair_idx][1]) {
-      if (!(data[dependency_pair_idx][1][dependency_idx] in nodes)) {
-        nodes[data[dependency_pair_idx][1][dependency_idx]] = graph.newNode({ label : data[dependency_pair_idx][1][dependency_idx] });
+      var dependency = data[dependency_pair_idx][1][dependency_idx]
+      if (!(dependency in nodes)) {
+        nodes[dependency] = graph.newNode({ label : dependency });
       }
     }
   }
