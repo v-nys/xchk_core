@@ -14,9 +14,10 @@ $(window).on('load', function() {
   const data = JSON.parse(document.getElementById('graph').textContent);
   var graph = new Springy.Graph();
   var nodes = {}
+  // dependency pair: object and a list of strings (node UID's)
   for (dependency_pair_idx in data) {
     if (!(data[dependency_pair_idx][0] in nodes)) {
-      nodes[data[dependency_pair_idx][0]] = graph.newNode({ label : data[dependency_pair_idx][0]});
+      nodes[data[dependency_pair_idx][0].title] = graph.newNode({ label : data[dependency_pair_idx][0].title});
     }
     for (dependency_idx in data[dependency_pair_idx][1]) {
       if (!(data[dependency_pair_idx][1][dependency_idx] in nodes)) {
@@ -26,7 +27,7 @@ $(window).on('load', function() {
   }
   for (dependency_pair_idx in data) {
     for (dependency_idx in data[dependency_pair_idx][1]) {
-      graph.newEdge(nodes[data[dependency_pair_idx][1][dependency_idx]],nodes[data[dependency_pair_idx][0]]);
+      graph.newEdge(nodes[data[dependency_pair_idx][1][dependency_idx]],nodes[data[dependency_pair_idx][0].title]);
     }
   }
   jQuery(function(){
