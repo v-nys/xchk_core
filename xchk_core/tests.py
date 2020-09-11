@@ -147,6 +147,32 @@ class Instructions2HtmlTest(TestCase):
         soup2 = BeautifulSoup(intended,'html.parser')
         self.assertEqual(soup1.prettify(),soup2.prettify())
 
+class ImplicitConjunctionTest(TestCase):
+
+    def test_instructions_two_flat_checks_one_implicit(self):
+        self.assertTrue(False)
+
+    def test_negative_instructions_two_flat_checks_one_implicit(self):
+        self.assertTrue(False)
+
+    def test_instructions_two_checks_explicit_compound(self):
+        self.assertTrue(False)
+
+    def test_negative_instructions_two_checks_explicit_compound(self):
+        self.assertTrue(False)
+
+    def test_checked_submission_two_flat_checks_one_implicit(self):
+        self.assertTrue(False)
+
+    def test_checked_submission_two_flat_checks_one_implicit_parent_is_negation(self):
+        self.assertTrue(False)
+
+    def test_checked_submission_two_checks_explicit_compound(self):
+        self.assertTrue(False)
+
+    def test_checked_submission_two_checks_explicit_compound_parent_is_negation(self):
+        self.assertTrue(False)
+
 class RepoFormTest(TestCase):
 
     def test_can_import(self):
