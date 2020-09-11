@@ -15,7 +15,7 @@ class Course:
         # could be optimized, but computation should be small enough
         def _predecessors(cvs,inverted_structure):
             num = len(cvs)
-            for cv in cvs:
+            for cv in set(cvs): # copy to avoid iterating and mutating simultaneously
                 direct_predecessors = first(inverted_structure,default=(cv,[]),pred=lambda x: x[0] == cv)[1]
                 for dp in direct_predecessors:
                     cvs.add(dp)
