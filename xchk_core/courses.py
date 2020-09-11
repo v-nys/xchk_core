@@ -23,7 +23,7 @@ class Course:
                 return cvs
             else:
                 return _predecessors(cvs,inverted_structure)
-        return _predecessors(set(cv),invert_edges(self.structure))
+        return _predecessors({cv},invert_edges(self.structure))
 
 def courses():
     course_dict = {}
