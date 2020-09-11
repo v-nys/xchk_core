@@ -105,20 +105,24 @@ jQuery.fn.springy = function(params) {
 		if (node && node.data && node.data.ondoubleclick) {
 			node.data.ondoubleclick();
 		}
+                else if (node) {
+console.log(node);
+}
 	});
 
 	var clicktimer = 0;
 
 	jQuery(canvas).mousedown(function(e) {
-		var pos = jQuery(this).offset();
-		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
-		selected = layout.nearest(p);
 		clicktimer = new Date().getTime();
 	});
 
 	jQuery(canvas).mouseup(function(e) {
 		if (new Date().getTime() < (clicktimer + 500)) {
+		var pos = jQuery(this).offset();
+		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
+		selected = layout.nearest(p);
 		    node = selected.node;
+console.log(node);
 		    if (node && node.data && node.data.onclick) {
 		    	node.data.onclick();
 		    }

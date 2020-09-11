@@ -12,32 +12,36 @@
 <script>
 $(window).on('load', function() {
   const data = JSON.parse(document.getElementById('graph').textContent);
-  var graph = new Springy.Graph();
-  var nodes = {}
+  let graph = new Springy.Graph();
+  let nodes = {}
   // dependency pair: object and a list of strings (node UID's)
   // object has title field and URL field
   // first make node objects for all dependents and their dependencies
   for (dependency_pair_idx in data) {
-    var dependent = data[dependency_pair_idx][0]
+    let dependent = data[dependency_pair_idx][0]
     if (!(dependent.title in nodes)) {
-	    nodes[dependent.title] = graph.newNode({ label : dependent.title, onclick : function() {window.location.href = 'http://www.google.be'}});
+	    nodes[dependent.title] = graph.newNode({ label : dependent.title, url : dependent.url, onclick : function() {
+window.location.href = dependent.url
+}});
     }
     for (dependency_idx in data[dependency_pair_idx][1]) {
-      var dependency = data[dependency_pair_idx][1][dependency_idx]
+      let dependency = data[dependency_pair_idx][1][dependency_idx]
       if (!(dependency.title in nodes)) {
-	      nodes[dependency.title] = graph.newNode({ label : dependency.title, onclick : function() {window.location.href = 'http://www.ubuntu.com'} });
+	      nodes[dependency.title] = graph.newNode({ label : dependency.title, url : dependency.url, onclick : function() {
+window.location.href = dependency.url
+} });
       }
     }
   }
   for (dependency_pair_idx in data) {
-    var dependent = data[dependency_pair_idx][0]
+    let dependent = data[dependency_pair_idx][0]
     for (dependency_idx in data[dependency_pair_idx][1]) {
-      var dependency = data[dependency_pair_idx][1][dependency_idx]
+      let dependency = data[dependency_pair_idx][1][dependency_idx]
       graph.newEdge(nodes[dependency.title],nodes[dependent.title]);
     }
   }
   jQuery(function(){
-    var springy = window.springy = jQuery('#springydemo').springy({
+    let springy = window.springy = jQuery('#springydemo').springy({
       graph: graph,
     });
   });
