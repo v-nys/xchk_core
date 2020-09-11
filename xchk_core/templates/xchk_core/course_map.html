@@ -20,14 +20,15 @@ $(window).on('load', function() {
   for (dependency_pair_idx in data) {
     let dependent = data[dependency_pair_idx][0]
     if (!(dependent.title in nodes)) {
-	    nodes[dependent.title] = graph.newNode({ label : dependent.title, url : dependent.url, onclick : function() {
+	    // TODO: also set green / orange...
+	    nodes[dependent.title] = graph.newNode({ label : dependent.title, url : dependent.url, color : dependent.locked ? '#aaaaaa' : '#000000', onclick : function() {
 window.location.href = dependent.url
 }});
     }
     for (dependency_idx in data[dependency_pair_idx][1]) {
       let dependency = data[dependency_pair_idx][1][dependency_idx]
       if (!(dependency.title in nodes)) {
-	      nodes[dependency.title] = graph.newNode({ label : dependency.title, url : dependency.url, onclick : function() {
+	      nodes[dependency.title] = graph.newNode({ label : dependency.title, url : dependency.url, color : dependency.locked ? '#aaaaaa' : '#000000',onclick : function() {
 window.location.href = dependency.url
 } });
       }
