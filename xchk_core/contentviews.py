@@ -37,7 +37,7 @@ class ContentView(View,LoginRequiredMixin):
 
     @classmethod
     def completed_by(cls,user,user_submissions=None):
-        if not user_submissions:
+        if user_submissions is None:
             submissions = Submission.objects.filter(content_uid=cls.uid).filter(submitter=user)
         else:
             # if it is supplied, it should be a normal iterable
@@ -46,7 +46,7 @@ class ContentView(View,LoginRequiredMixin):
 
     @classmethod
     def accepted_for(cls,user,user_submissions=None):
-        if not user_submissions:
+        if user_submissions is None:
             submissions = Submission.objects.filter(content_uid=cls.uid).filter(submitter=user)
         else:
             submissions = filter(lambda x: x.content_uid == cls.uid, user_submissions)
