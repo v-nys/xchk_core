@@ -32,7 +32,7 @@ $(window).on('load', function() {
   for (dependency_pair_idx in data) {
     var dependent = data[dependency_pair_idx][0]
     for (dependency_idx in data[dependency_pair_idx][1]) {
-      var dependency = data[dependency_pair_idx][1]
+      var dependency = data[dependency_pair_idx][1][dependency_idx]
       graph.newEdge(nodes[dependency.title],nodes[dependent.title]);
     }
   }
