@@ -16,7 +16,7 @@ class Course:
         def _predecessors(cvs,inverted_structure):
             num = len(cvs)
             for cv in cvs:
-                direct_predecessors = first(inverted_structure,default=(cv,[]),pred=lambda x: x[0] == dependent)[1]
+                direct_predecessors = first(inverted_structure,default=(cv,[]),pred=lambda x: x[0] == cv)[1]
                 for dp in direct_predecessors:
                     cvs.add(dp)
             if len(cvs) == num:
