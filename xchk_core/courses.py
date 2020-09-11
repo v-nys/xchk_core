@@ -13,17 +13,17 @@ class Course:
 
     def predecessors(self,cv):
         # could be optimized, but computation should be small enough
-        def _predecessors(cvs,inverted_structure):
+        def _predecessors(cvs):
             num = len(cvs)
             for cv in set(cvs): # copy to avoid iterating and mutating simultaneously
-                direct_predecessors = first(inverted_structure,default=(cv,[]),pred=lambda x: x[0] == cv)[1]
+                direct_predecessors = first(self.structure,default=(cv,[]),pred=lambda x: x[0] == cv)[1]
                 for dp in direct_predecessors:
                     cvs.add(dp)
             if len(cvs) == num:
                 return cvs
             else:
-                return _predecessors(cvs,inverted_structure)
-        rec = _predecessors({cv},invert_edges(self.structure))
+                return _predecessors(cvs)
+        rec = _predecessors({cv})
         rec.remove(cv)
         return rec
 
