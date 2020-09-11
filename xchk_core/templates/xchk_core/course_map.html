@@ -39,9 +39,6 @@ $(window).on('load', function() {
   jQuery(function(){
     var springy = window.springy = jQuery('#springydemo').springy({
       graph: graph,
-      nodeSelected: function(node) {
-        window.location.href = node.data.url
-      }
     });
   });
 }); 
