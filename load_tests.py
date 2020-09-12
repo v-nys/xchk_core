@@ -9,7 +9,7 @@ boot_django()
 default_labels = ["xchk_core.tests", ]
 
 def get_suite(labels=default_labels):
-    from django.test.runner import DiscoverRunner
+    from redgreenunittest.django.runner import DiscoverRunner
     runner = DiscoverRunner(verbosity=1)
     failures = runner.run_tests(labels)
     if failures:
