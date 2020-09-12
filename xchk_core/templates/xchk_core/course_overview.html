@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 {% if repo_id %}
-<p>Je repo op je machine krijgen doe je met volgend commando, nadat je Git geïnstalleerd en geconfigureerd hebt: <code>{{ clone_command }}</code>.</p>
+<p class="alert alert-info">Je repo op je machine krijgen doe je met volgend commando, nadat je Git geïnstalleerd en geconfigureerd hebt: <code>{{ clone_command }}</code>.</p>
 {% endif %}
 {{ toc|safe }}
 <p><a href="{% url 'checkerapp:delete_repo_view' repo_id %}">Mijn repository voor deze cursus verwijderen.</a></p>
