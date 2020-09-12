@@ -160,8 +160,16 @@ class MoreSpecificSituationsCheck(CheckingPredicate):
         return self.disjuncts[-1].negative_instructions(exercise_name)
 
     def check_submission(self,submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation=False,open=open):
-        explicit_check = DisjunctiveCheck(self.disjuncts).check_submission(submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation,open)
-        return explicit_check
+        explicit_check_result = DisjunctiveCheck(self.disjuncts).check_submission(submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation,open)
+        # for components: first component pertains to the disjunction itself and is irrelevant
+        # components pertaining to specific cases *may* take precedence over component for the displayed component if they succeed and success is not desired
+        # note that displayed component may be a compound
+        # in other words: we cannot just compare the last component to other components
+        # we need to find the component representing the last check at this level
+        # if its outcome is the desired outcome, we need to return this component and all components after it, with adjusted init_check_numbers
+        translated_check_result = OutcomeAnalysis(outcome=explicit_check_result.outcome,
+                                                  outcomes_components=[])
+        return translated_check_result
 
 class CatchallCheck(CheckingPredicate):
     """A conjunction with one catchall instruction.
@@ -174,12 +182,14 @@ class CatchallCheck(CheckingPredicate):
 
     def __init__(self,conjuncts,single_instruction,single_negative_instruction):
         self.conjuncts = conjuncts
+        self.single_instruction = single_instruction
+        self.single_negative_instruction = single_negative_instruction
 
     def instructions(self,exercise_name):
-        return [single_instruction.format(exercise_name=exercise_name)]
+        return [self.single_instruction.format(exercise_name=exercise_name)]
 
     def negative_instructions(self,exercise_name):
-        return [single_negative_instruction.format(exercise_name=exercise_name)]
+        return [self.single_negative_instruction.format(exercise_name=exercise_name)]
 
     def check_submission(self,submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation=False,open=open):
         explicit_check = ConjunctiveCheck(self.conjuncts).check_submission(submission,student_path,desired_outcome,init_check_number,ancestor_has_alternatives,parent_is_negation,open)
@@ -260,7 +270,7 @@ class DisjunctiveCheck(CheckingPredicate):
                 error_msg = f"OR moest {desired_outcome} leveren, leverde {exit_code}"
             else:
                 error_msg = f"AND moest {not desired_outcome} leveren, leverde {not exit_code}"
-        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,rendered_data=f"<p>{error_msg}</p>",acceptable_to_ancestor=exit_code == desired_outcome or ancestor_has_alternatives)] + analysis_children)
+        return OutcomeAnalysis(outcome=exit_code,outcomes_components=[OutcomeComponent(component_number=init_check_number,outcome=exit_code,desired_outcome=desired_outcome,rendered_data=f"<p>{error_msg}</p>" if exit_code != desired_outcome else "",acceptable_to_ancestor=exit_code == desired_outcome or ancestor_has_alternatives)] + analysis_children)
 
 class Strategy:
 

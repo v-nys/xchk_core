@@ -1,6 +1,6 @@
 import unittest
 from django.test import TestCase
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch, MagicMock, call
 from bs4 import BeautifulSoup
 from xchk_core.models import Submission, Repo
 from xchk_core.strats import *
@@ -87,9 +87,8 @@ class CheckSubmissionTest(TestCase):
         submission.repo = Repo()
         submission.repo.url = "www.google.be"
         submission.checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-        analysis = strat.check_submission(submission,'/tmp/student')
-        print(analysis)
-        self.assertTrue(False)
+        analysis = strat.check_submission(submission,'/tmp/student')[0]
+        self.assertEqual(analysis.submission_state,SubmissionState.UNDECIDED)
 
 class Instructions2HtmlTest(TestCase):
 
@@ -153,39 +152,61 @@ class MoreSpecificSituationsCheckTest(TestCase):
         self.more_specific = ConjunctiveCheck([FileExistsCheck('file1'),FileExistsCheck('file2')])
         self.less_specific = FileExistsCheck('file1')
         self.compound = MoreSpecificSituationsCheck([self.more_specific,self.less_specific])
+        self.submission = Submission()
+        self.submission.repo = Repo()
+        self.submission.repo.url = "www.google.be"
+        self.submission.checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        self.student_path = '/tmp/student'
 
     def test_instructions(self):
-        self.assertEqual(self.compound.instructions('someex'),["Je hebt een bestand met de naam file1"])
+        self.assertEqual(self.compound.instructions('someex'),["Je hebt een bestand met naam file1"])
 
     def test_negative_instructions(self):
-        self.assertEqual(self.compound.negative_instructions('someex'),["Je hebt geen bestand met de naam file1"])
+        self.assertEqual(self.compound.negative_instructions('someex'),["Je hebt geen bestand met naam file1"])
 
     def test_check_desiring_true_non_negated_globally_true(self):
-        # file1 check should pass
-        # file2 check should fail
-        # if it fails, the less specific second one will still pass
-        # so the analysis should not mention the check for file2
-        self.assertTrue(False)
+        with patch('os.path.exists',side_effect=[True,False,True]) as mock_path_exists:
+            analysis = self.compound.check_submission(submission=self.submission,student_path=self.student_path,desired_outcome=True,init_check_number=1,ancestor_has_alternatives=False)
+            mock_path_exists.assert_has_calls([call('/tmp/student/file1'),call('/tmp/student/file2'),call('/tmp/student/file1')])
+        self.assertEqual(analysis, OutcomeAnalysis(True,[OutcomeComponent(component_number=1,outcome=True,desired_outcome=True,rendered_data='',acceptable_to_ancestor=True)]))
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_true_non_negated_globally_false(self):
+        # niet zinvol hier specifiekere feedback te gebruiken, alleen nuttig als specifiekere check *slaagt* (en dat ongewenst is)
+        # feedback moet dus zelfde zijn als voor gewoon falen van algemene check op zich
+        with patch('os.path.exists',side_effect=[False,False,False]) as mock_path_exists:
+            analysis = self.compound.check_submission(submission=self.submission,student_path=self.student_path,desired_outcome=True,init_check_number=1,ancestor_has_alternatives=False)
+            mock_path_exists.assert_has_calls([call('/tmp/student/file1'),call('/tmp/student/file2'),call('/tmp/student/file1')])
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_true_negated_globally_true(self):
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_true_negated_globally_false(self):
+        # niet zinvol hier specifiekere feedback te gebruiken, alleen nuttig als specifiekere check *slaagt* (en dat ongewenst is)
+        # feedback moet dus zelfde zijn als voor gewoon falen van algemene check op zich
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_false_non_negated_globally_true(self):
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_false_non_negated_globally_false(self):
+        # niet zinvol hier specifiekere feedback te gebruiken, alleen nuttig als specifiekere check *slaagt* (en dat ongewenst is)
+        # feedback moet dus zelfde zijn als voor gewoon falen van algemene check op zich
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_false_negated_globally_true(self):
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_false_negated_globally_false(self):
+        # niet zinvol hier specifiekere feedback te gebruiken, alleen nuttig als specifiekere check *slaagt* (en dat ongewenst is)
+        # feedback moet dus zelfde zijn als voor gewoon falen van algemene check op zich
         self.assertTrue(False)
 
 class CatchallCheckTest(TestCase):
@@ -196,7 +217,12 @@ class CatchallCheckTest(TestCase):
         self.compound = CatchallCheck([self.component1, self.component2],
                                       'Je hebt alle files die vermeld worden in de opgave',
                                       'Je hebt minstens een file die vermeld wordt in de opgave niet')
-
+        self.submission = Submission()
+        self.submission.repo = Repo()
+        self.submission.repo.url = "www.google.be"
+        self.submission.checksum = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        self.student_path = '/tmp/student'
+ 
     def test_instructions(self):
         self.assertEqual(self.compound.instructions('someex'),["Je hebt alle files die vermeld worden in de opgave"])
 
@@ -204,26 +230,39 @@ class CatchallCheckTest(TestCase):
         self.assertEqual(self.compound.negative_instructions('someex'),["Je hebt minstens een file die vermeld wordt in de opgave niet"])
 
     def test_check_desiring_true_non_negated_globally_true(self):
-        self.assertTrue(False)
+        with patch('os.path.exists',side_effect=[True,True]) as mock_path_exists:
+            analysis = self.compound.check_submission(submission=self.submission,student_path=self.student_path,desired_outcome=True,init_check_number=1,ancestor_has_alternatives=False)
+            mock_path_exists.assert_has_calls([call('/tmp/student/file1'),call('/tmp/student/file2')])
+        # should be presented as having just one component
+        self.assertEqual(analysis, OutcomeAnalysis(True,[OutcomeComponent(component_number=1,outcome=True,desired_outcome=True,rendered_data='',acceptable_to_ancestor=True)]))
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_true_non_negated_globally_false(self):
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_true_negated_globally_true(self):
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_true_negated_globally_false(self):
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_false_non_negated_globally_true(self):
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_false_non_negated_globally_false(self):
-        self.assertTrue(False)
+        with patch('os.listdir',return_value=['file1']) as mock_listdir:
+            analysis = self.compound.check_submission(submission=self.submission,student_path=self.student_path,desired_outcome=False,init_check_number=1,ancestor_has_alternatives=False)
+        self.assertEqual(analysis, OutcomeAnalysis(False,[]))
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_false_negated_globally_true(self):
         self.assertTrue(False)
 
+    @unittest.skip("still working on simpler cases")
     def test_check_desiring_false_negated_globally_false(self):
         self.assertTrue(False)
 
