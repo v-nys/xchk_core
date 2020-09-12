@@ -58,7 +58,11 @@ def new_course_view(request,course_title):
     tocified = courses.tocify(course.structure,inverted_course)
     ul_representation = ulify(tocified,request,course_title)
     dependencies = {k.uid : [v.uid for v in vs] for (k,vs) in course.structure}
-    return render(request,'xchk_core/course_overview.html',{'toc':ul_representation,'supplied_dependencies':dependencies})
+    data = {'toc':ul_representation,'supplied_dependencies':dependencies}
+    if repo:
+        data['repo_id'] = repo.id
+        data['clone_command'] = f'git clone {repo.url}'
+    return render(request,'xchk_core/course_overview.html',data)
 
 def course_map_view(request,course_title):
     structure = courses.courses()[course_title].structure
