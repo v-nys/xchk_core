@@ -1,14 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
-{{ toc|safe }}
-
 {% if repo_id %}
-<code>{{ clone_command }}</code>
-<a href="{% url 'checkerapp:delete_repo_view' repo_id %}">Mijn repository voor deze cursus verwijderen.</a>
+<p>Je repo op je machine krijgen doe je met volgend commando, nadat je Git geïnstalleerd en geconfigureerd hebt: <code>{{ clone_command }}</code>.</p>
 {% endif %}
- 
+{{ toc|safe }}
+<p><a href="{% url 'checkerapp:delete_repo_view' repo_id %}">Mijn repository voor deze cursus verwijderen.</a></p>
 {% endblock %}
 
 {% block javascript %}
