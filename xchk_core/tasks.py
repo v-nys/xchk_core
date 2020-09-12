@@ -43,7 +43,9 @@ def check_submission_batch(repo_id,submission_ids,*args,**kwargs):
     # all id's have been queried by consumer, so assume they are okay
     repo = Repo.objects.get(id=repo_id)
     subprocess.run(f'rm -rf {STUDENT_SOLUTION_DIR}',shell=True)
-    subprocess.run(f'git clone {repo.url} {STUDENT_SOLUTION_DIR}',shell=True)
+    # repo.url is not directly usable for deployment in docker containers
+    # bit of a hack, revisit later...
+    subprocess.run(f'git clone {repo.url.replace("@localhost:,@gitea:")} {STUDENT_SOLUTION_DIR}',shell=True)
     subprocess.run(f'chmod -R 777 {STUDENT_SOLUTION_DIR}',shell=True)
     checksum = subprocess.run(f'cd {STUDENT_SOLUTION_DIR} ; git rev-parse HEAD',\
                               shell=True,\
