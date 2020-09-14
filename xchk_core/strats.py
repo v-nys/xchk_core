@@ -161,7 +161,9 @@ class FileExistsCheck(CheckingPredicate):
             extra_info = f"{entry} bestaat"
         elif not outcome and desired_outcome:
             extra_info = f"""<p><code>{entry}</code> bestaat niet. Als je toch een bestand met deze naam op de juiste locatie op jouw machine ziet, let er dan op dat de bestandsextensie deel uitmaakt van de bestandsnaam. Zorg eerst dat bestandsextensies getoond worden. <a href='https://sawtoothsoftware.com/resources/knowledge-base/general-issues/how-to-show-file-name-extensions-in-windows-explorer'>Hier</a> staat hoe je dat kan doen onder Windows. <a href='https://www.techradar.com/how-to/computing/apple/how-to-show-or-hide-file-extensions-in-mac-os-x-1295830'>Hier</a> staat hoe je dat kan doen onder Mac OS.</p>
-            <p>Kopieer, wanneer bestandsextensies getoond worden, de gevraagde bestandsnaam en plak die over de naam van het bestand dat je al hebt. Dit kan ook moeilijk te spotten typfouten voorkomen.</p>"""
+            <p>Kopieer, wanneer bestandsextensies getoond worden, de gevraagde bestandsnaam en plak die over de naam van het bestand dat je al hebt. Dit kan ook moeilijk te spotten typfouten voorkomen.</p>
+
+            <p>Je kan je geüploade bestanden terugvinden op <a href="gitea.xchk.be">gitea.xchk.be</a>. Om hier de eerste keer in te loggen, gebruik je het wachtwoord dat je terugvindt op je profielpagina.</p>"""
         else:
             extra_info = None
         components = [OutcomeComponent(component_number=init_check_number,
