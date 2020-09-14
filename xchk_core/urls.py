@@ -7,7 +7,6 @@ app_name = 'checkerapp'
 urlpatterns = [
     path('', views.index_view, name='index'),
     path('create_repo', views.CreateRepoView.as_view(), name='create_repo'),
-    path('test_gitea', views.test_gitea_view, name='test_gitea'),
     path('content/impossible_node', contentviews.ImpossibleNodeView.as_view(), name=f'{contentviews.ImpossibleNodeView.uid}_view'),
     path('nodes/feedback/<int:node_pk>', views.node_feedback_view, name='node_feedback_view'),
     path('courses/<course_title>', views.new_course_view, name='new_course_view'),

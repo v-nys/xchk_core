@@ -23,19 +23,6 @@ import json
 def index_view(request):
     return render(request,'xchk_core/index.html')
 
-def test_gitea_view(request):
-    # using HTTP here!
-    # test: maakt een repo aan
-    url = f'http://gitea:3000/api/v1/admin/users/{request.user.username}/repos'
-    data = {'auto_init': True,
-            'default_branch': 'master',
-            'description': 'repo for xchk',
-            'name': 'my_first_repo',
-            'private': True}
-    headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
-    response = requests.post(url, data=json.dumps(data), headers=headers)
-    return render(request, 'checkerapp/gitea_test_result.html',{'response':response})
-
 @login_required
 def submission_view(request,submission_pk):
     if request.user.is_superuser:
