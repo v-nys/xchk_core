@@ -5,7 +5,9 @@
 <p class="alert alert-info">Je repo op je machine krijgen doe je met volgend commando, nadat je Git geïnstalleerd en geconfigureerd hebt: <code>{{ clone_command }}</code>.</p>
 {% endif %}
 {{ toc|safe }}
+{% if repo_id %}
 <p><a href="{% url 'checkerapp:delete_repo_view' repo_id %}">Mijn repository voor deze cursus verwijderen.</a></p>
+{% endif %}
 {% endblock %}
 
 {% block javascript %}
