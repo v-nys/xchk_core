@@ -176,4 +176,7 @@ class DeleteRepoView(LoginRequiredMixin,DeleteView):
         obj = self.get_object()
         if obj.user != self.request.user and not self.request.user.is_superuser:
             return HttpResponseForbidden("Je mag geen repository verwijderen die aan iemand anders toebehoort.")
+        url = f'http://gitea:3000/api/v1/repos/{self.request.user.username}/{self.model.course}'
+        headers = {'accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': f'token {settings.GITEA_APPLICATION_TOKEN}'}
+        del_response = requests.delete(url, headers=headers)
         return super(DeleteView,self).dispatch(request, *args, **kwargs)
