@@ -27,7 +27,7 @@ Copyright (c) 2010 Dennis Hotson
 
 jQuery.fn.springy = function(params) {
 	var graph = this.graph = params.graph || new Springy.Graph();
-	var nodeFont = "16px Verdana, sans-serif";
+	var nodeFont = "12px Verdana, sans-serif";
 	var edgeFont = "8px Verdana, sans-serif";
 	var stiffness = params.stiffness || 400.0;
 	var repulsion = params.repulsion || 400.0;
@@ -164,7 +164,7 @@ console.log(node);
 	};
 
 	var getTextHeight = function(node) {
-		return 16;
+		return 12;
 		// In a more modular world, this would actually read the font size, but I think leaving it a constant is sufficient for now.
 		// If you change the font size, I'd adjust this too.
 	};
