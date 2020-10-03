@@ -153,6 +153,9 @@ class CreateRepoView(LoginRequiredMixin,CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        existing_repos = Repo.objects.filter(user=request.user).filter(course=form.instance.course)
+        if len(existing_repos):
+            return render(request,'xchk_core/repo_exists.html',{'course_title': form.instance.course})
         url = f'http://gitea:3000/api/v1/admin/users/{self.request.user.username}/repos'
         data = {'auto_init': True,
                 'default_branch': 'master',
