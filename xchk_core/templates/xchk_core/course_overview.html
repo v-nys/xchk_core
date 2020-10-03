@@ -2,8 +2,8 @@
 {% load static %}
 {% block content %}
 {% if repo_id %}
-<p class="alert alert-info">Je repo op je machine krijgen doe je met volgend commando, nadat je Git geïnstalleerd en geconfigureerd hebt: <code>{{ clone_command }}</code>. "Geconfigureerd" houdt volgende drie zaken in: instellen van je naam, instellen van je e-mailadres, instellen van je private sleutel (zie je profielpagina voor de sleutel). Instructies om dit te doen staan op de hoofdpagina.
-</p>
+<p class="alert alert-info">Zorg eerst dat je Git geïnstalleerd en geconfigureerd hebt. Instructies om dit te doen staan op de hoofdpagina. Daarna kan je volgend commando uitvoeren:</p>
+<pre><code>{{ clone_command }}</code></pre>
 {% endif %}
 {{ toc|safe }}
 {% if repo_id %}
