@@ -2,8 +2,9 @@
 {% load static %}
 {% block content %}
 {% if repo_id %}
-<p class="alert alert-info">Zorg eerst dat je Git geïnstalleerd en geconfigureerd hebt. Instructies om dit te doen staan op de hoofdpagina. Daarna kan je volgend commando uitvoeren:</p>
+<p class="alert alert-info">Zorg eerst dat je Git geïnstalleerd en geconfigureerd hebt. Instructies om dit te doen staan op de hoofdpagina. Daarna kan je volgend commando uitvoeren:
 <code style="display: block">{{ clone_command }}</code>
+</p>
 {% endif %}
 {{ toc|safe }}
 {% if repo_id %}
