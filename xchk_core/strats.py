@@ -71,6 +71,8 @@ class CheckingPredicate:
 class TrueCheck(CheckingPredicate):
     pass
 
+FalseCheck = lambda: Negation(TrueCheck())
+
 class Negation(CheckingPredicate):
 
     def __init__(self,negated):

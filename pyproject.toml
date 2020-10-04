@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xchk-core"
-version = "0.2.0"
+version = "0.2.1"
 description = "Core functionality for the xchk teaching framework"
 authors = ["Vincent Nys <vincentnys@gmail.com>"]
 license = "MIT"
