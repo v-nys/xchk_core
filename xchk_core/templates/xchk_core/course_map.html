@@ -21,11 +21,11 @@ $(window).on('load', function() {
     let dependent = data[dependency_pair_idx][0]
     if (!(dependent.title in nodes)) {
 	    let dependent_color = '#000000';
+	    if (dependent.completed) {
+		dependent_color = '#298030';
+	    }
 	    if(dependent.locked) {
 		dependent_color = '#aaaaaa';
-	    }
-	    else if (dependent.completed) {
-		dependent_color = '#298030';
 	    }
 	    nodes[dependent.title] = graph.newNode({ label : dependent.title, url : dependent.url, color : dependent_color, onclick : function() {
 window.location.href = dependent.url
@@ -34,15 +34,14 @@ window.location.href = dependent.url
     for (dependency_idx in data[dependency_pair_idx][1]) {
       let dependency = data[dependency_pair_idx][1][dependency_idx]
       let dependency_color = '#000000';
+      if (dependency.completed) {
+          dependency_color = '#298030';
+      }
       if(dependency.locked) {
           dependency_color = '#aaaaaa';
       }
-      else if (dependency.completed) {
-          dependency_color = '#298030';
-      }
-      
       if (!(dependency.title in nodes)) {
-	      nodes[dependency.title] = graph.newNode({ label : dependency.title, url : dependency.url, color : dependency.locked ? '#aaaaaa' : '#000000',onclick : function() {
+	      nodes[dependency.title] = graph.newNode({ label : dependency.title, url : dependency.url, color : dependency_color,onclick : function() {
 window.location.href = dependency.url
 } });
       }
