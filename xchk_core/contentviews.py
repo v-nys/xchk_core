@@ -23,7 +23,7 @@ class ContentView(View,LoginRequiredMixin):
 
     @classmethod
     def is_accessible_by(cls,user,user_submissions=None):
-        return user.is_superuser or any(cls.is_accessible_by_in(user,course,user_submissions) for course in courses.courses())
+        return True
 
     @classmethod
     def is_accessible_by_in(cls,user,course,user_submissions=None):
