@@ -36,8 +36,7 @@ def new_course_view(request,course_title):
     try:
         repo = Repo.objects.filter(user=request.user).get(course=course_title)
     except ObjectDoesNotExist as e:
-        if not request.user.is_superuser:
-            return render(request,'xchk_core/repo_does_not_exist.html',{'course_title': course_title})
+        pass
     # from dependent to dependencies
     course = courses.courses()[course_title]
     # from dependency to dependents
