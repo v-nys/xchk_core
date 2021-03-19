@@ -51,8 +51,8 @@ def new_course_view(request,course_title):
     return render(request,'xchk_core/single_course_overview.html',data)
 
 def all_courses_overview_view(request):
-    courses = courses.courses()
-    return render(request,'xchk_core/all_courses_overview.html',courses)
+    all_courses = courses.courses()
+    return render(request,'xchk_core/all_courses_overview.html',{'courses':all_courses})
 
 def course_map_view(request,course_title):
     structure = courses.courses()[course_title].structure
