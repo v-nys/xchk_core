@@ -48,7 +48,11 @@ def new_course_view(request,course_title):
     if repo:
         data['repo_id'] = repo.id
         data['clone_command'] = f'git clone {repo.url}'
-    return render(request,'xchk_core/course_overview.html',data)
+    return render(request,'xchk_core/single_course_overview.html',data)
+
+def all_courses_overview_view(request):
+    courses = courses.courses()
+    return render(request,'xchk_core/all_courses_overview.html',courses)
 
 def course_map_view(request,course_title):
     structure = courses.courses()[course_title].structure
